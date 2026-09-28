@@ -3884,3 +3884,246 @@ body:not(.lock-active) > #celebrationSky {
 #timerScreen.is-visible button {
   pointer-events: auto !important;
 }
+
+/* =========================================================
+   📱 MOBILE FIX — DOES NOT AFFECT DESKTOP
+   ========================================================= */
+
+@media (max-width: 600px) {
+
+  /* Main journey card */
+  #birthdayJourneyContainer {
+    padding: 12px 8px !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .journey-card {
+    width: calc(100vw - 24px) !important;
+    max-width: none !important;
+    padding: 18px 12px 20px !important;
+    border-radius: 24px !important;
+    margin: 10px auto !important;
+    box-sizing: border-box !important;
+
+    /* Reduce expensive blur on mobile */
+    backdrop-filter: blur(10px) !important;
+    -webkit-backdrop-filter: blur(10px) !important;
+  }
+
+  /* Stage heading */
+  .stage-tag {
+    font-size: 11px !important;
+    padding: 5px 10px !important;
+    max-width: 100% !important;
+  }
+
+  .stage-title {
+    font-size: clamp(21px, 6vw, 26px) !important;
+    line-height: 1.15 !important;
+    margin-bottom: 8px !important;
+  }
+
+  .stage-subtitle {
+    font-size: 13px !important;
+    line-height: 1.45 !important;
+    padding: 0 4px !important;
+    margin-bottom: 12px !important;
+  }
+
+  /* =========================
+     STAGE 3 — LOVE COUPONS
+     ========================= */
+
+  .scratch-grid {
+    width: 100% !important;
+    gap: 12px !important;
+    margin: 12px 0 !important;
+  }
+
+  .scratch-card {
+    width: 100% !important;
+    height: 150px !important;
+    min-height: 150px !important;
+  }
+
+  .scratch-front,
+  .scratch-back {
+    width: 100% !important;
+    height: 100% !important;
+    padding: 12px !important;
+    border-radius: 16px !important;
+    overflow: hidden !important;
+  }
+
+  .scratch-front-left {
+    gap: 9px !important;
+    min-width: 0 !important;
+    flex: 1 !important;
+  }
+
+  .scratch-front .card-icon-wrap {
+    width: 40px !important;
+    height: 40px !important;
+    min-width: 40px !important;
+    font-size: 20px !important;
+  }
+
+  .card-hint-title {
+    font-size: 14px !important;
+    line-height: 1.2 !important;
+    margin: 0 !important;
+  }
+
+  .card-hint-sub {
+    font-size: 10px !important;
+    line-height: 1.25 !important;
+    margin-top: 3px !important;
+  }
+
+  .scratch-badge {
+    font-size: 9px !important;
+    padding: 5px 7px !important;
+    flex-shrink: 0 !important;
+  }
+
+  /* Revealed coupon */
+  .scratch-back {
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+    align-items: center !important;
+    text-align: center !important;
+  }
+
+  .scratch-back-tag {
+    font-size: 10px !important;
+    line-height: 1.2 !important;
+    margin-bottom: 4px !important;
+  }
+
+  .scratch-back h4 {
+    font-size: 17px !important;
+    line-height: 1.15 !important;
+    margin: 3px 0 6px !important;
+  }
+
+  .scratch-back p {
+    font-size: 11px !important;
+    line-height: 1.35 !important;
+    margin: 0 !important;
+    padding: 0 4px !important;
+    max-height: 72px !important;
+    overflow-y: auto !important;
+  }
+
+  /* Grand Celebration button */
+  #toFinaleBtn,
+  #toScratchBtn,
+  .journey-btn {
+    max-width: 100% !important;
+    font-size: 14px !important;
+    padding: 11px 18px !important;
+    margin-top: 10px !important;
+  }
+
+
+  /* =========================
+     💌 LETTER CARD MOBILE FIX
+     ========================= */
+
+  #letterScene .boxLetter .formLetter {
+    width: calc(100vw - 40px) !important;
+    max-width: 600px !important;
+    height: min(500px, 72vh) !important;
+    padding: 14px !important;
+    border-radius: 20px !important;
+  }
+
+  #letterScene .formLetter .wrapperLetter {
+    width: 100% !important;
+    height: 100% !important;
+    overflow: hidden !important;
+  }
+
+  #letterScene .textLetter {
+    width: 100% !important;
+    padding: 10px !important;
+    box-sizing: border-box !important;
+  }
+
+  #letterScene .textLetter h2 {
+    font-size: clamp(22px, 7vw, 30px) !important;
+    line-height: 1.15 !important;
+    text-align: center !important;
+  }
+
+  #letterScene .textLetter .contentLetter {
+    font-size: 15px !important;
+    line-height: 1.45 !important;
+    padding: 0 8px !important;
+    max-height: 45vh !important;
+    overflow-y: auto !important;
+    text-align: center !important;
+  }
+
+  #letterScene .giftbox {
+    display: none !important;
+  }
+
+  #letterScene .letterNextBtn {
+    right: 50% !important;
+    bottom: -48px !important;
+    transform: translateX(50%) !important;
+    font-size: 14px !important;
+    padding: 10px 22px !important;
+  }
+
+  #letterScene .letterNextBtn:hover {
+    transform: translateX(50%) !important;
+  }
+
+
+  /* =========================
+     🚀 MOBILE PERFORMANCE
+     ========================= */
+
+  .scratch-front::after {
+    animation-duration: 6s !important;
+  }
+
+  .journey-backdrop {
+    backdrop-filter: blur(4px) !important;
+    -webkit-backdrop-filter: blur(4px) !important;
+  }
+
+  .journey-card {
+    will-change: auto !important;
+  }
+}
+
+
+/* Extra-small phones */
+@media (max-width: 380px) {
+
+  .journey-card {
+    width: calc(100vw - 16px) !important;
+    padding: 15px 9px 18px !important;
+  }
+
+  .scratch-card {
+    height: 155px !important;
+  }
+
+  .scratch-back h4 {
+    font-size: 15px !important;
+  }
+
+  .scratch-back p {
+    font-size: 10.5px !important;
+  }
+
+  .stage-title {
+    font-size: 20px !important;
+  }
+}
