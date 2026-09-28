@@ -1,0 +1,3886 @@
+* {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      height: 100%;
+      overflow: hidden;
+    }
+
+    body {
+      height: 100vh;
+      width: 100vw;
+      position: relative;
+      overflow: hidden;
+      -webkit-touch-callout: none;
+      -webkit-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
+    }
+
+    .background-image {
+      position: absolute;
+      width: 100vw;
+      height: 100vh;
+      object-fit: cover;
+      object-position: center;
+      transition: transform 0.3s ease;
+      z-index: 1;
+    }
+
+    .corner-image {
+      position: absolute;
+      width: 60vw;
+      height: 60vh;
+      object-fit: cover;
+      transition: transform 0.3s ease;
+      z-index: 1;
+    }
+
+    .corner-image-right {
+      position: absolute;
+      width: 90vw;
+      height: 90vh;
+      object-fit: cover;
+      transition: transform 0.3s ease;
+      z-index: 1;
+    }
+
+    .bottom-left-right {
+      position: absolute;
+      width: 50vw;
+      height: 50vh;
+      bottom: -10vh;
+      right: -20vh;
+      object-fit: cover;
+      transition: transform 0.3s ease;
+      z-index: 2;
+      transform: rotate(-20deg);
+    }
+
+
+    .heart1 {
+      position: absolute;
+      width: min(26vw, 320px);
+      height: min(26vw, 320px);
+      bottom: -8vh;
+      right: 5vh;
+      object-fit: contain;
+      transition: transform 0.3s ease;
+      z-index: 1;
+    }
+
+    .heart2 {
+      position: absolute;
+      width: min(18vw, 220px);
+      height: min(18vw, 220px);
+      bottom: 35vh;
+      right: 22vh;
+      object-fit: contain;
+      transition: transform 0.3s ease;
+      z-index: 1;
+      transform: rotate(-19deg);
+    }
+
+    /* Bottom-left corner decoration */
+    .bottom-left {
+      bottom: 0vh;
+      left: -19vh;
+      transform-origin: top left;
+    }
+
+    .bottom-right {
+      bottom: 0vh;
+      right: -19vh;
+      transform-origin: top right;
+    }
+
+
+    /* Top-left corner decoration */
+    .top-left {
+      top: -15vh;
+      left: -25vw;
+      transform-origin: bottom left;
+    }
+
+
+
+
+    /* ---------- Page Load & Dynamic Animations ---------- */
+    /* Custom CSS properties for rotation and scaling without transform conflicts */
+    @property --scale {
+      syntax: '<number>';
+      inherits: false;
+      initial-value: 1;
+    }
+
+    /* Custom properties for gift box lid animation interpolation */
+    @property --lidY {
+      syntax: '<length-percentage>';
+      inherits: false;
+      initial-value: 0px;
+    }
+
+    @property --lidRot {
+      syntax: '<angle>';
+      inherits: false;
+      initial-value: 0deg;
+    }
+
+    /* Heart elements: use --rot for angle, --scale for heartbeat animation */
+    .heart1,
+    .heart2 {
+      transform: rotate(var(--rot, 0deg)) scale(var(--scale, 1));
+      transform-origin: center;
+    }
+
+    /* Set individual angles for heart elements */
+    .heart1 {
+      --rot: 0deg;
+    }
+
+    .heart2 {
+      --rot: -19deg;
+    }
+
+    /* Heartbeat keyframe animation altering --scale */
+    @keyframes heartbeat {
+
+      0%,
+      100% {
+        --scale: 1;
+      }
+
+      25% {
+        --scale: 1.06;
+      }
+
+      50% {
+        --scale: 0.98;
+      }
+
+      75% {
+        --scale: 1.06;
+      }
+    }
+
+    /* Center Interactive Gift Box Container */
+    .boxgift {
+      position: absolute;
+      top: 60%;
+      left: 50%;
+      /* Secondary variables for position and rotation offsets */
+      --tx: 0;
+      --ty: 0;
+      --rot: 0deg;
+      transform: translate(-50%, -50%) translate(var(--tx), var(--ty)) rotate(var(--rot)) scale(var(--scale, 1));
+      z-index: 3;
+      width: min(12vw, 110px);
+      aspect-ratio: 1 / 1;
+      /* Relative boundary for layered gift box components */
+      pointer-events: auto;
+      cursor: pointer;
+    }
+
+    .boxgift .box-gift {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100%;
+      height: auto;
+      object-fit: contain;
+      image-rendering: auto;
+    }
+
+    /* Gift box base positioned at bottom */
+    .boxgift .base {
+      bottom: 0;
+      z-index: 1;
+    }
+
+    /* Gift box lid layered smoothly over base */
+    .boxgift .lid {
+      bottom: 60%;
+      z-index: 2;
+      /* Default closed state */
+      transform: translateX(-50%) translateY(0) rotate(0deg);
+      transform-origin: center;
+    }
+
+    /* Gentle idle pulse animation for gift box prior to interaction */
+    @keyframes giftPulse {
+
+      0%,
+      100% {
+        --scale: 1;
+      }
+
+      50% {
+        --scale: 1.08;
+      }
+    }
+
+    body.is-loaded .boxgift {
+      animation: giftPulse 1.2s ease-in-out .4s infinite;
+    }
+
+    /* Lid opening animation */
+    @keyframes lidOpenTransform {
+      0% {
+        transform: translateX(-50%) translateY(0) rotate(0deg);
+      }
+
+      60% {
+        transform: translateX(-50%) translateY(-58%) rotate(-22deg);
+      }
+
+      100% {
+        transform: translateX(-50%) translateY(-52%) rotate(-18deg);
+      }
+    }
+
+    .boxgift.open {
+      animation: none;
+    }
+
+    .boxgift.open .lid {
+      animation: lidOpenTransform .7s ease-out forwards;
+    }
+
+    /* Subtle floating motion for decorative corner assets */
+    @keyframes floatY {
+      0% {
+        transform: translateY(0);
+      }
+
+      100% {
+        transform: translateY(-10px);
+      }
+    }
+
+    /* Smooth fade-in transition */
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+
+      to {
+        opacity: 1;
+      }
+    }
+
+    /* Hero headline styling */
+    .headline {
+      position: absolute;
+      top: 20%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 3;
+      width: 92vw;
+      text-align: center;
+      font-family: 'Dancing Script', cursive;
+      font-weight: 700;
+      font-size: clamp(32px, 7.6vw, 104px);
+      line-height: 1.5;
+      letter-spacing: 0.2px;
+      padding: 0 2vw;
+      background: linear-gradient(90deg, #ff77aa, #f70e8e, #b9515f);
+      background-size: 300% 100%;
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      filter: drop-shadow(0 6px 18px rgba(255, 105, 180, 0.35));
+      opacity: 0;
+    }
+
+    @keyframes gradientShift {
+      0% {
+        background-position: 0% 50%;
+      }
+
+      100% {
+        background-position: 100% 50%;
+      }
+    }
+
+    @keyframes glowPulse {
+
+      0%,
+      100% {
+        filter: drop-shadow(0 6px 18px rgba(255, 105, 180, 0.35));
+      }
+
+      50% {
+        filter: drop-shadow(0 10px 26px rgba(255, 105, 180, 0.65));
+      }
+    }
+
+    body.is-loaded .headline {
+      animation: fadeIn .9s ease-out .3s forwards, gradientShift 6s linear .9s infinite, glowPulse 2.4s ease-in-out .9s infinite;
+    }
+
+    /* Preloader initial hidden state */
+    body:not(.is-loaded) .background-image,
+    body:not(.is-loaded) .corner-image,
+    body:not(.is-loaded) .corner-image-right,
+    body:not(.is-loaded) .heart1,
+    body:not(.is-loaded) .heart2 {
+      opacity: 0;
+    }
+
+    /* Page loaded state: trigger entrance sequences */
+    body.is-loaded .background-image {
+      animation: fadeIn .6s ease-out forwards;
+    }
+
+    body.is-loaded .corner-image {
+      animation: fadeIn .8s ease-out forwards, floatY 6s ease-in-out .8s infinite alternate;
+    }
+
+    body.is-loaded .corner-image-right {
+      animation: fadeIn .9s ease-out forwards, floatY 7s ease-in-out .9s infinite alternate;
+    }
+
+    /* Synchronized heartbeat animation starting after entrance */
+    body.is-loaded .heart1 {
+      animation: fadeIn 1s ease-out forwards, heartbeat 1.5s ease-in-out 1.1s infinite;
+    }
+
+    /* Responsive: Large Desktop */
+    @media (min-width: 1440px) {
+      .headline {
+        top: 22%;
+        font-size: clamp(48px, 5.6vw, 120px);
+      }
+
+      .boxgift {
+        width: min(14vw, 220px);
+        top: 58%;
+      }
+
+      .corner-image-right {
+        width: 86vw;
+        height: 86vh;
+        right: -16vh;
+      }
+
+      .corner-image.bottom-left {
+        left: -16vh;
+      }
+    }
+
+    /* Responsive: Tablet */
+    @media (max-width: 1024px) {
+      .headline {
+        top: calc(18% + env(safe-area-inset-top, 0px));
+        font-size: clamp(28px, 6.2vw, 72px);
+      }
+
+      .boxgift {
+        width: min(22vw, 140px);
+        top: 62%;
+      }
+
+      .corner-image {
+        width: 64vw;
+        height: 54vh;
+      }
+
+      .corner-image-right {
+        width: 96vw;
+        height: 86vh;
+        right: -18vh;
+      }
+
+      .corner-image.bottom-left {
+        left: -22vh;
+      }
+    }
+
+    /* Responsive: Tablet Portrait / Phablet */
+    @media (max-width: 768px) {
+      .headline {
+        top: calc(17% + env(safe-area-inset-top, 0px));
+        font-size: clamp(26px, 7.2vw, 64px);
+      }
+
+      .boxgift {
+        width: min(40vw, 170px);
+        top: 64%;
+      }
+
+      .corner-image {
+        width: 70vw;
+        height: 50vh;
+      }
+
+      .corner-image-right {
+        width: 110vw;
+        height: 92vh;
+        right: -24vh;
+      }
+
+      .corner-image.bottom-left {
+        left: -24vh;
+      }
+
+      .heart1 {
+        width: 38vw;
+        height: 38vw;
+      }
+
+      .heart2 {
+        width: 24vw;
+        height: 24vw;
+        right: 12vh;
+        bottom: 36vh;
+      }
+    }
+
+    /* Responsive: Mobile */
+    @media (max-width: 600px) {
+      .headline {
+        top: calc(14% + env(safe-area-inset-top, 0px));
+        font-size: clamp(24px, 8.8vw, 56px);
+        line-height: 1.2;
+        padding: 0 4vw;
+      }
+
+      .boxgift {
+        width: min(26vw, 80px);
+        top: 45%;
+      }
+
+      .heart1 {
+        width: 52vw;
+        height: auto;
+        bottom: 3vh;
+        right: 0;
+      }
+
+      .heart2 {
+        width: 28vw;
+        height: auto;
+        bottom: 20vh;
+        right: 8vh;
+      }
+
+      .corner-image-right {
+        width: 128vw;
+        height: 50vh;
+        right: -2vh;
+      }
+
+      .corner-image.bottom-left {
+        left: -6vh;
+      }
+
+      /* Hide secondary overlay on mobile */
+      .bottom-left-right {
+        display: none;
+      }
+    }
+
+
+    /* Accessibility: prefers-reduced-motion support */
+    @media (prefers-reduced-motion: reduce) {
+
+      /* Reduce ambient motion while preserving core interactions */
+      .background-image,
+      .corner-image,
+      .corner-image-right {
+        animation: none !important;
+      }
+    }
+
+    /* Hide initial UI layer upon gift box opening */
+    body.hide-ui .corner-image,
+    body.hide-ui .corner-image-right,
+    body.hide-ui .bottom-left-right,
+    body.hide-ui .heart1,
+    body.hide-ui .heart2,
+    body.hide-ui .headline,
+    body.hide-ui .boxgift {
+      opacity: 0 !important;
+      pointer-events: none !important;
+      transition: opacity .4s ease !important;
+    }
+
+    /* Final cleanup state: dismiss letter scene */
+    body.final-hide #letterScene {
+      display: none !important;
+    }
+
+    /* Utility hidden class */
+    .is-hidden {
+      display: none !important;
+    }
+
+    /* Central preloader spinner */
+    #pageLoader {
+      position: absolute;
+      inset: 0;
+      z-index: 1000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0, 0, 0, .45);
+    }
+
+    #pageLoader.show {
+      display: flex;
+    }
+
+    #pageLoader .wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 14px;
+    }
+
+    #pageLoader .spinner {
+      width: 64px;
+      height: 64px;
+      border: 6px solid rgba(211, 7, 234, 0.35);
+      border-top-color: #a317a5;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    #pageLoader .text {
+      color: hsl(296, 97%, 65%);
+      font-family: system-ui, sans-serif;
+      font-size: 20px;
+      text-align: center;
+      padding: 0 16px;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    /* ---------- INTERACTIVE LETTER & ENVELOPE SCENE ---------- */
+    /* Encapsulated container for the letter & envelope reveal */
+    #letterScene {
+      position: absolute;
+      inset: 0;
+      z-index: 10;
+      display: none;
+    }
+
+    #letterScene .container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 97vh;
+    }
+
+    #letterScene .container svg {
+      width: 50%;
+      height: 50%;
+    }
+
+    #letterScene * {
+      margin: 0;
+      padding: 0;
+    }
+
+    #letterScene .body-letter {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background-color: transparent;
+    }
+
+    #letterScene .letter {
+      position: relative;
+      z-index: 1;
+    }
+
+    #letterScene .valentines {
+      position: relative;
+      top: 50px;
+      cursor: pointer;
+      animation: up 3s linear infinite;
+    }
+
+    @keyframes up {
+
+      0%,
+      100% {
+        transform: translateY(0);
+      }
+
+      50% {
+        transform: translateY(-30px);
+      }
+    }
+
+    #letterScene .envelope {
+      position: relative;
+      width: 300px;
+      height: 200px;
+      background-color: #f08080;
+    }
+
+    #letterScene .envelope:before {
+      background-color: #f08080;
+      content: "";
+      position: absolute;
+      width: 212px;
+      height: 212px;
+      transform: rotate(45deg);
+      top: -105px;
+      left: 44px;
+      border-radius: 30px 0 0 0;
+    }
+
+    #letterScene .card {
+      position: absolute;
+      background-color: #eae2b7;
+      width: 270px;
+      height: 170px;
+      top: 5px;
+      left: 15px;
+      box-shadow: -5px -5px 100px rgba(0, 0, 0, 0.4);
+    }
+
+    #letterScene .card:before {
+      content: "";
+      position: absolute;
+      border: 3px dotted #003049;
+      width: 240px;
+      height: 140px;
+      left: 12px;
+      top: 12px;
+    }
+
+    #letterScene .text {
+      position: absolute;
+      font-family: 'Brush Script MT', cursive;
+      font-size: 30px;
+      text-align: center;
+      line-height: 25px;
+      top: 19px;
+      left: 85px;
+      color: #003049;
+    }
+
+    #letterScene .heart {
+      background-color: #d62828;
+      display: inline-block;
+      height: 30px;
+      margin: 0 10px;
+      position: relative;
+      top: 110px;
+      left: 105px;
+      transform: rotate(-45deg);
+      width: 30px;
+    }
+
+    #letterScene .heart:before,
+    #letterScene .heart:after {
+      content: "";
+      background-color: #d62828;
+      border-radius: 50%;
+      height: 30px;
+      position: absolute;
+      width: 30px;
+    }
+
+    #letterScene .heart:before {
+      top: -15px;
+      left: 0;
+    }
+
+    #letterScene .heart:after {
+      left: 15px;
+      top: 0;
+    }
+
+    #letterScene .hearts {
+      position: absolute;
+      top: 0;
+    }
+
+    #letterScene .one,
+    #letterScene .two,
+    #letterScene .three,
+    #letterScene .four,
+    #letterScene .five {
+      background-color: red;
+      display: inline-block;
+      height: 10px;
+      margin: 0 10px;
+      position: relative;
+      transform: rotate(-45deg);
+      width: 10px;
+      top: 50px;
+    }
+
+    #letterScene .one:before,
+    #letterScene .one:after,
+    #letterScene .two:before,
+    #letterScene .two:after,
+    #letterScene .three:before,
+    #letterScene .three:after,
+    #letterScene .four:before,
+    #letterScene .four:after,
+    #letterScene .five:before,
+    #letterScene .five:after {
+      content: "";
+      background-color: red;
+      border-radius: 50%;
+      height: 10px;
+      position: absolute;
+      width: 10px;
+    }
+
+    #letterScene .one:before,
+    #letterScene .two:before,
+    #letterScene .three:before,
+    #letterScene .four:before,
+    #letterScene .five:before {
+      top: -5px;
+      left: 0;
+    }
+
+    #letterScene .one:after,
+    #letterScene .two:after,
+    #letterScene .three:after,
+    #letterScene .four:after,
+    #letterScene .five:after {
+      left: 5px;
+      top: 0;
+    }
+
+    #letterScene .one {
+      left: 10px;
+      animation: heart 1s ease-out infinite;
+    }
+
+    #letterScene .two {
+      left: 30px;
+      animation: heart 2s ease-out infinite;
+    }
+
+    #letterScene .three {
+      left: 50px;
+      animation: heart 1.5s ease-out infinite;
+    }
+
+    #letterScene .four {
+      left: 70px;
+      animation: heart 2.3s ease-out infinite;
+    }
+
+    #letterScene .five {
+      left: 90px;
+      animation: heart 1.7s ease-out infinite;
+    }
+
+    @keyframes heart {
+      0% {
+        transform: translateY(0) rotate(-45deg) scale(0.3);
+        opacity: 1;
+      }
+
+      100% {
+        transform: translateY(-150px) rotate(-45deg) scale(1.3);
+        opacity: 0.5;
+      }
+    }
+
+    #letterScene .front {
+      position: absolute;
+      border-right: 180px solid #f4978e;
+      border-top: 95px solid transparent;
+      border-bottom: 100px solid transparent;
+      left: 120px;
+      top: 5px;
+      width: 0;
+      height: 0;
+      z-index: 10;
+    }
+
+    #letterScene .front:before {
+      position: absolute;
+      content: "";
+      border-left: 300px solid #f8ad9d;
+      border-top: 195px solid transparent;
+      left: -120px;
+      top: -95px;
+      width: 0;
+      height: 0;
+    }
+
+    #letterScene .shadow {
+      position: absolute;
+      width: 330px;
+      height: 25px;
+      border-radius: 50%;
+      background-color: rgba(0, 0, 0, 0.3);
+      top: 265px;
+      left: -15px;
+      animation: scale 3s linear infinite;
+      z-index: -1;
+    }
+
+    @keyframes scale {
+
+      0%,
+      100% {
+        transform: scaleX(1);
+      }
+
+      50% {
+        transform: scaleX(0.85);
+      }
+    }
+
+    #letterScene .hover-animation {
+      animation: hover 1.75s ease-in-out infinite;
+    }
+
+    #letterScene #castle {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background-color: transparent;
+    }
+
+    #letterScene .dustDef {
+      position: absolute;
+      background-color: white;
+      border-radius: 100%;
+      box-shadow: 0 0 3px 1px white;
+      opacity: 0;
+    }
+
+    @keyframes hover {
+      0% {
+        margin-top: 60px;
+      }
+
+      50% {
+        margin-top: 50px;
+      }
+
+      100% {
+        margin-top: 60px;
+      }
+    }
+
+    @keyframes glow {
+      0% {
+        box-shadow: 0 0 25px 0 #e8b2ca;
+      }
+
+      50% {
+        box-shadow: 0 0 45px 0 #e8b2ca;
+      }
+
+      100% {
+        box-shadow: 0 0 25px 0 #e8b2ca;
+      }
+    }
+
+    @keyframes fall {
+      5% {
+        top: 209px;
+        left: 105px;
+        transform: rotate(55deg) scale(0.9, 0.95) skew(-18deg);
+        opacity: .9;
+      }
+
+      30% {
+        left: 90px;
+      }
+
+      55% {
+        left: 130px;
+      }
+
+      60%,
+      100% {
+        top: 380px;
+        transform: rotate(30deg) scale(0.9, 0.95) skew(-32deg);
+        opacity: 0;
+      }
+    }
+
+    @keyframes floatAnimate {
+      0% {
+        background-size: 105% 120%;
+        background-position: 0 0;
+        opacity: .7;
+      }
+
+      50% {
+        background-size: 100% 100%;
+        background-position: 0 0;
+        opacity: .5;
+      }
+
+      100% {
+        background-size: 105% 120%;
+        background-position: 0 0;
+        opacity: .7;
+      }
+    }
+
+    #letterScene svg {
+      width: 80%;
+      display: block;
+      position: absolute;
+      margin: auto;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 1;
+    }
+
+    #letterScene text {
+      fill: #e6668a;
+      font-family: consolas;
+      font-size: 9px;
+    }
+
+    #letterScene p {
+      position: absolute;
+      z-index: 2;
+    }
+
+    #letterScene label {
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      opacity: .8;
+    }
+
+    #letterScene .wrapperLetterForm {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 1000;
+      background: rgba(0, 0, 0, 0.7);
+      display: none;
+    }
+
+    #letterScene .boxLetter {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    #letterScene .boxLetter .formLetter {
+      position: relative;
+      width: 600px;
+      height: 350px;
+      background-color: #FFEBEB;
+      border-radius: 20px;
+      z-index: 100;
+      padding: 20px 15px;
+      box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+    }
+
+    #letterScene .formLetter .wrapperLetter {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      border: 2px dashed #FF6666;
+      border-radius: inherit;
+      display: flex;
+    }
+
+    #letterScene .boxLetter .before {
+      position: absolute;
+      width: 600px;
+      height: 350px;
+      background: #fff;
+      transform: rotate(-15deg);
+      border-radius: 20px;
+      z-index: 10;
+    }
+
+    #letterScene .formLetter .heartLetter {
+      position: absolute;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background: #FFEBEB;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 10;
+    }
+
+    #letterScene .heartLetter .heartLetterItem {
+      position: relative;
+      width: 10px;
+      height: 10px;
+      transform: rotate(45deg);
+      background: #FF6666;
+    }
+
+    #letterScene .heartLetter:first-child {
+      right: 5px;
+      top: 10px;
+    }
+
+    #letterScene .heartLetter:nth-child(2) {
+      left: 5px;
+      bottom: 10px;
+    }
+
+    #letterScene .heartLetterItem::before,
+    #letterScene .heartLetterItem::after {
+      position: absolute;
+      content: '';
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      background: inherit;
+    }
+
+    #letterScene .heartLetterItem::before {
+      top: -50%;
+    }
+
+    #letterScene .heartLetterItem::after {
+      left: -50%;
+    }
+
+    #letterScene .giftbox {
+      position: relative;
+      width: 40%;
+      height: 100%;
+    }
+
+    #letterScene .giftbox .img {
+      position: absolute;
+      width: 160px;
+      bottom: -10px;
+      left: 0;
+      z-index: 100;
+    }
+
+    #letterScene .giftbox img {
+      width: 100%;
+    }
+
+    #letterScene .textLetter {
+      width: 100%;
+      flex-direction: column;
+      justify-content: center;
+      display: flex;
+      align-items: center;
+      user-select: none;
+    }
+
+    #letterScene .textLetter h2 {
+      font-size: 30px;
+      font-weight: 700;
+      font-family: 'Dancing Script', cursive;
+    }
+
+    #letterScene .textLetter .contentLetter {
+      font-size: 19px;
+      text-align: center;
+      padding: 0 30px;
+      margin-top: 10px;
+      font-family: 'Dancing Script', cursive;
+      position: initial;
+      word-break: break-word;
+      overflow-wrap: anywhere;
+      white-space: pre-wrap;
+      max-height: 55vh;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    #letterScene .fa-xmark {
+      position: absolute;
+      right: 20px;
+      top: 20px;
+      color: #fff;
+      cursor: pointer;
+      font-size: 25px;
+    }
+
+    /* Next stage action button positioned cleanly beneath the letter card */
+    #letterScene .letterNextBtn {
+      position: absolute;
+      right: 25px;
+      bottom: -46px;
+      z-index: 120;
+      padding: 9px 24px;
+      border-radius: 50px;
+      border: none;
+      cursor: pointer;
+      background: linear-gradient(135deg, #ff4e83 0%, #ff758c 100%);
+      color: #fff;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-family: 'Outfit', sans-serif;
+      font-size: 14.5px;
+      font-weight: 700;
+      box-shadow: 0 8px 22px rgba(255, 78, 131, 0.5);
+      animation: nextBtnPulse 1.8s infinite ease-in-out;
+      transition: all 0.2s ease;
+    }
+
+    #letterScene .letterNextBtn:hover {
+      transform: scale(1.06);
+      box-shadow: 0 10px 26px rgba(255, 78, 131, 0.65);
+    }
+
+    #letterScene .letterNextBtn:active {
+      transform: scale(0.96);
+    }
+
+    @keyframes nextBtnPulse {
+      0%, 100% { transform: scale(1); box-shadow: 0 8px 22px rgba(255, 78, 131, 0.5); }
+      50% { transform: scale(1.06); box-shadow: 0 12px 28px rgba(255, 78, 131, 0.7); }
+    }
+
+    /* Envelope tap hint */
+    .envelope-hint {
+      position: absolute;
+      bottom: -45px;
+      left: 50%;
+      transform: translateX(-50%);
+      white-space: nowrap;
+      background: rgba(255, 255, 255, 0.92);
+      color: #ff3366;
+      font-family: 'Outfit', sans-serif;
+      font-size: 13.5px;
+      font-weight: 600;
+      padding: 6px 16px;
+      border-radius: 50px;
+      box-shadow: 0 6px 16px rgba(255, 78, 131, 0.3);
+      animation: hintBob 1.5s infinite ease-in-out;
+      pointer-events: none;
+      z-index: 15;
+    }
+
+    @keyframes hintBob {
+      0%, 100% { transform: translateX(-50%) translateY(0); }
+      50% { transform: translateX(-50%) translateY(-6px); }
+    }
+
+    #letterScene .show {
+      display: block;
+    }
+
+    #letterScene .heartAnimation {
+      position: absolute;
+      width: 150px;
+      bottom: 0;
+    }
+
+    #letterScene .heartAnimation img {
+      width: 100%;
+    }
+
+    #letterScene .mewmew1,
+    #letterScene .mewmew2 {
+      position: absolute;
+      width: 90px;
+    }
+
+    #letterScene .mewmew1 {
+      bottom: 0;
+      left: 0;
+    }
+
+    #letterScene .mewmew2 {
+      bottom: 0;
+      right: 0;
+    }
+
+    #letterScene .mewmew1 img,
+    #letterScene .mewmew2 img {
+      width: 100%;
+    }
+
+    #letterScene .signature {
+      position: absolute;
+      bottom: 12px;
+      right: 28px;
+      font-weight: 700;
+      font-family: 'Dancing Script', cursive;
+      font-size: 20px;
+      color: #ff4e83;
+      font-style: italic;
+      text-align: right;
+      z-index: 5;
+    }
+
+    @media (max-width: 480px) {
+      #letterScene .letterNextBtn {
+        bottom: -46px;
+        right: 50%;
+        transform: translateX(50%);
+        padding: 8px 20px;
+        font-size: 14px;
+      }
+
+      #letterScene .boxLetter .formLetter {
+        width: 92vw;
+        height: auto;
+        max-height: 80vh;
+      }
+
+      #letterScene .formLetter .wrapperLetter {
+        overflow: hidden;
+      }
+
+      #letterScene .giftbox {
+        display: none;
+      }
+
+      #letterScene .textLetter {
+        padding: 6px 4px;
+      }
+
+      #letterScene .textLetter h2 {
+        font-size: 24px;
+      }
+
+      #letterScene .textLetter .contentLetter {
+        font-size: 16px;
+        max-height: 58vh;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+        padding: 0 12px;
+      }
+
+      #letterScene .heartAnimation {
+        position: static;
+        width: 120px;
+        margin: 8px auto 0;
+      }
+
+      #letterScene .signature {
+        right: 35px;
+        bottom: 8px;
+        font-size: 16px;
+      }
+
+      #giftOverlay .caption {
+        bottom: 16vh;
+      }
+    }
+
+    /* ==========================================================
+       BIRTHDAY JOURNEY ENHANCEMENTS (CAKE, POLAROIDS, SCRATCH, FINALE)
+       ========================================================== */
+    #birthdayJourneyContainer {
+      position: fixed;
+      inset: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      font-family: 'Outfit', sans-serif;
+      box-sizing: border-box;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .journey-backdrop {
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(circle at center, rgba(255, 235, 245, 0.45) 0%, rgba(255, 180, 210, 0.3) 60%, rgba(30, 10, 25, 0.4) 100%);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      z-index: -1;
+    }
+
+    .journey-card {
+      width: 100%;
+      max-width: 490px;
+      background: rgba(255, 255, 255, 0.90);
+      backdrop-filter: blur(25px);
+      -webkit-backdrop-filter: blur(25px);
+      border-radius: 32px;
+      padding: 26px 22px 22px;
+      text-align: center;
+      box-shadow: 0 30px 70px rgba(255, 105, 180, 0.3), 0 0 40px rgba(255, 182, 193, 0.35);
+      border: 2px solid rgba(255, 255, 255, 0.95);
+      box-sizing: border-box;
+      position: relative;
+      margin: auto;
+      will-change: transform, opacity;
+    }
+
+    .stage-enter-active {
+      animation: smoothStageIn 0.5s cubic-bezier(0.2, 0.9, 0.3, 1) forwards;
+    }
+
+    .stage-exit-active {
+      animation: smoothStageOut 0.35s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    }
+
+    @keyframes smoothStageIn {
+      0% {
+        opacity: 0;
+        transform: translateY(22px) scale(0.96);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    @keyframes smoothStageOut {
+      0% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+      100% {
+        opacity: 0;
+        transform: translateY(-20px) scale(0.96);
+      }
+    }
+
+    .stage-tag {
+      display: inline-block;
+      padding: 5px 14px;
+      border-radius: 50px;
+      background: linear-gradient(135deg, #ffeef4 0%, #ffd1dc 100%);
+      color: #ff3366;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      margin-bottom: 10px;
+      border: 1px solid rgba(255, 51, 102, 0.15);
+    }
+
+    .stage-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 24px;
+      font-weight: 700;
+      color: #2b1025;
+      margin-bottom: 6px;
+    }
+
+    .stage-subtitle {
+      font-size: 13.5px;
+      color: #7a6375;
+      margin-bottom: 14px;
+      line-height: 1.4;
+    }
+
+    .journey-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      background: linear-gradient(135deg, #ff4e83 0%, #ff758c 100%);
+      color: #fff;
+      font-family: 'Outfit', sans-serif;
+      font-size: 15.5px;
+      font-weight: 600;
+      padding: 12px 26px;
+      border-radius: 50px;
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 8px 20px rgba(255, 78, 131, 0.4);
+      transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      margin-top: 14px;
+      user-select: none;
+    }
+
+    .journey-btn:hover {
+      transform: translateY(-2px) scale(1.03);
+      box-shadow: 0 12px 25px rgba(255, 78, 131, 0.55);
+    }
+
+    .journey-btn:active {
+      transform: translateY(1px) scale(0.98);
+    }
+
+    .journey-btn.secondary-btn {
+      background: #fff;
+      color: #ff4e83;
+      border: 2px solid #ffd1dc;
+      box-shadow: 0 4px 12px rgba(255, 105, 180, 0.15);
+    }
+
+    /* --- STAGE 1: 3D REALISTIC CAKE & CANDLE --- */
+    .cake-wrapper-3d {
+      position: relative;
+      width: 280px;
+      height: 270px;
+      margin: 4px auto 10px;
+      cursor: pointer;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .cake-3d-img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      filter: drop-shadow(0 15px 30px rgba(255, 105, 180, 0.35));
+      transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .cake-wrapper-3d:hover .cake-3d-img {
+      transform: scale(1.03);
+    }
+
+    /* Interactive realistic candle flame overlay */
+    .flame-overlay-3d {
+      position: absolute;
+      top: 16px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 22px;
+      height: 38px;
+      background: radial-gradient(ellipse at bottom, #ffffff 0%, #fff7a1 20%, #ff8c00 70%, #ff2200 100%);
+      border-radius: 50% 50% 35% 35%;
+      box-shadow: 0 0 25px #ffbb00, 0 0 45px #ff5500, 0 0 70px rgba(255, 200, 0, 0.8);
+      animation: flameFlicker3D 0.5s infinite alternate ease-in-out;
+      transform-origin: center bottom;
+      transition: opacity 0.4s ease, transform 0.4s ease;
+      z-index: 10;
+    }
+
+    @keyframes flameFlicker3D {
+      0% { transform: translateX(-50%) scale(1) rotate(-2deg); opacity: 0.92; }
+      100% { transform: translateX(-50%) scale(1.15, 1.25) rotate(2.5deg); opacity: 1; filter: drop-shadow(0 0 20px #ffea00); }
+    }
+
+    .flame-overlay-3d.blown-out {
+      opacity: 0 !important;
+      transform: translateX(-50%) scale(0.1) translateY(-15px) !important;
+    }
+
+    .smoke-3d {
+      position: absolute;
+      top: 15px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 10px;
+      height: 10px;
+      background: rgba(220, 220, 220, 0.85);
+      border-radius: 50%;
+      opacity: 0;
+      pointer-events: none;
+      z-index: 15;
+    }
+
+    .smoke-3d.active {
+      animation: smokeRise3D 1.8s forwards ease-out;
+    }
+
+    @keyframes smokeRise3D {
+      0% { opacity: 0.9; transform: translateX(-50%) scale(1) translate(0, 0); }
+      50% { opacity: 0.6; transform: translateX(-50%) scale(4) translate(-12px, -30px); }
+      100% { opacity: 0; transform: translateX(-50%) scale(7) translate(18px, -70px); }
+    }
+
+    .tap-hint-3d {
+      position: absolute;
+      bottom: 2px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: linear-gradient(135deg, #ff477e 0%, #ff758c 100%);
+      color: #fff;
+      padding: 6px 16px;
+      border-radius: 50px;
+      font-size: 12px;
+      font-weight: 600;
+      white-space: nowrap;
+      box-shadow: 0 6px 16px rgba(255, 71, 126, 0.4);
+      animation: pulseTap3D 1.6s infinite;
+      z-index: 5;
+    }
+
+    @keyframes pulseTap3D {
+      0%, 100% { transform: translateX(-50%) scale(1); }
+      50% { transform: translateX(-50%) scale(1.06); }
+    }
+
+    .wish-celebration-text {
+      background: #fff8fa;
+      border: 1px dashed #ff8da1;
+      padding: 12px 16px;
+      border-radius: 16px;
+      margin-top: 12px;
+      animation: fadeInUp 0.5s ease;
+    }
+
+    .wish-celebration-text h3 {
+      font-family: 'Playfair Display', serif;
+      color: #ff3366;
+      font-size: 18px;
+      margin-bottom: 4px;
+    }
+
+    .wish-celebration-text p {
+      font-size: 13px;
+      color: #555;
+      margin: 0;
+    }
+
+    /* --- STAGE 2: POLAROID MEMORIES (PHYSICS STACK) --- */
+    .polaroid-deck {
+      position: relative;
+      width: 275px;
+      height: 345px;
+      margin: 8px auto 14px;
+      perspective: 1000px;
+    }
+
+    .polaroid-card {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: #ffffff;
+      border-radius: 14px;
+      padding: 14px 14px 18px;
+      box-sizing: border-box;
+      box-shadow: 0 16px 35px rgba(0, 0, 0, 0.12), 0 3px 10px rgba(0,0,0,0.06);
+      transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.5s ease, filter 0.5s ease;
+      opacity: 0;
+      transform: scale(0.88) translateY(20px) rotate(5deg);
+      pointer-events: none;
+      display: flex;
+      flex-direction: column;
+      will-change: transform, opacity;
+    }
+
+    .polaroid-card.active {
+      opacity: 1;
+      transform: scale(1) translateY(0) rotate(-1.5deg);
+      pointer-events: auto;
+      z-index: 10;
+      filter: blur(0);
+    }
+
+    .polaroid-card.swiped-out {
+      opacity: 0;
+      transform: translateX(-125%) rotate(-25deg) scale(0.82);
+      filter: blur(2px);
+      z-index: 20;
+    }
+
+    .washi-tape {
+      position: absolute;
+      top: -10px;
+      left: 50%;
+      transform: translateX(-50%) rotate(2deg);
+      width: 80px;
+      height: 22px;
+      background: rgba(255, 182, 193, 0.7);
+      border-left: 2px dashed rgba(255, 105, 180, 0.4);
+      border-right: 2px dashed rgba(255, 105, 180, 0.4);
+      box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+      z-index: 10;
+    }
+
+    .washi-pink { background: rgba(255, 105, 180, 0.6); }
+    .washi-gold { background: rgba(255, 215, 0, 0.65); }
+    .washi-sparkle { background: rgba(255, 138, 174, 0.75); }
+
+    .polaroid-img-wrap {
+      width: 100%;
+      height: 230px;
+      border-radius: 8px;
+      overflow: hidden;
+      background: #f5f5f5;
+    }
+
+    .polaroid-img-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center top;
+      transition: transform 0.4s ease;
+    }
+
+    .polaroid-caption {
+      font-family: 'Dancing Script', cursive;
+      font-size: 18px;
+      font-weight: 700;
+      color: #333;
+      margin: 10px 0 2px;
+      line-height: 1.2;
+    }
+
+    .polaroid-tag {
+      font-size: 11px;
+      color: #ff477e;
+      font-weight: 600;
+    }
+
+    .polaroid-dots {
+      display: flex;
+      justify-content: center;
+      gap: 6px;
+      margin-bottom: 8px;
+    }
+
+    .polaroid-dots .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #ffd1dc;
+      transition: all 0.3s ease;
+    }
+
+    .polaroid-dots .dot.active {
+      width: 22px;
+      border-radius: 10px;
+      background: #ff477e;
+    }
+
+    /* --- STAGE 3: SCRATCH CARDS (LUXURY VOUCHERS) --- */
+    .scratch-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      margin: 16px 0;
+    }
+
+    .scratch-card {
+      position: relative;
+      width: 100%;
+      height: 108px;
+      perspective: 1000px;
+      cursor: pointer;
+    }
+
+    .scratch-inner {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+      transform-style: preserve-3d;
+      border-radius: 18px;
+    }
+
+    .scratch-card.revealed .scratch-inner {
+      transform: rotateY(180deg);
+    }
+
+    .scratch-front, .scratch-back {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      backface-visibility: hidden;
+      border-radius: 18px;
+      box-sizing: border-box;
+    }
+
+    .scratch-front {
+      background: linear-gradient(135deg, #ff8da1 0%, #ff6b8b 50%, #ffa5b9 100%);
+      border: 2px dashed rgba(255, 255, 255, 0.9);
+      box-shadow: 0 8px 20px rgba(255, 107, 139, 0.35);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 18px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .scratch-front::after {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: linear-gradient(60deg, transparent 30%, rgba(255,255,255,0.4) 50%, transparent 70%);
+      transform: rotate(30deg);
+      animation: shimmerFoil 3s infinite linear;
+      pointer-events: none;
+    }
+
+    @keyframes shimmerFoil {
+      0% { transform: translateX(-100%) rotate(30deg); }
+      100% { transform: translateX(100%) rotate(30deg); }
+    }
+
+    .scratch-front-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-align: left;
+    }
+
+    .scratch-front .card-icon-wrap {
+      width: 46px;
+      height: 46px;
+      background: rgba(255, 255, 255, 0.3);
+      backdrop-filter: blur(8px);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      flex-shrink: 0;
+    }
+
+    .scratch-front .card-hint-title {
+      font-family: 'Outfit', sans-serif;
+      font-weight: 700;
+      color: #ffffff;
+      font-size: 16px;
+      margin: 0;
+      text-shadow: 0 1px 3px rgba(0,0,0,0.15);
+    }
+
+    .scratch-front .card-hint-sub {
+      font-size: 12px;
+      color: #fff0f3;
+      margin-top: 2px;
+    }
+
+    .scratch-badge {
+      background: #ffffff;
+      color: #ff3366;
+      font-family: 'Outfit', sans-serif;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 7px 14px;
+      border-radius: 50px;
+      letter-spacing: 0.5px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      animation: pulseBadge 1.8s infinite;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    @keyframes pulseBadge {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+
+    .scratch-back {
+      background: #ffffff;
+      border: 2px solid #ff4e83;
+      transform: rotateY(180deg);
+      box-shadow: 0 10px 25px rgba(255, 78, 131, 0.22);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 10px 18px;
+    }
+
+    .scratch-back-tag {
+      font-size: 10.5px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: #ff3366;
+      background: #fff0f5;
+      padding: 2px 8px;
+      border-radius: 10px;
+      margin-bottom: 4px;
+    }
+
+    .scratch-back h4 {
+      font-family: 'Playfair Display', serif;
+      font-size: 15.5px;
+      font-weight: 700;
+      color: #ff3366;
+      margin: 0 0 4px;
+    }
+
+    .scratch-back p {
+      font-family: 'Outfit', sans-serif;
+      font-size: 12.5px;
+      font-weight: 500;
+      color: #3b1828;
+      margin: 0;
+      line-height: 1.35;
+    }
+
+    /* --- STAGE 4: GRAND FINALE --- */
+    .finale-crown {
+      font-size: 42px;
+      margin-bottom: 8px;
+      animation: crownFloat 2s infinite ease-in-out alternate;
+    }
+
+    @keyframes crownFloat {
+      0% { transform: translateY(0) rotate(-4deg); }
+      100% { transform: translateY(-8px) rotate(4deg); }
+    }
+
+    .finale-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 28px;
+      color: #ff3366;
+      margin-bottom: 12px;
+    }
+
+    .finale-text {
+      font-family: 'Dancing Script', cursive;
+      font-size: 20px;
+      font-weight: 700;
+      color: #4a1937;
+      line-height: 1.4;
+      margin-bottom: 18px;
+      padding: 0 10px;
+    }
+
+    .floating-hearts-cluster {
+      display: flex;
+      justify-content: center;
+      gap: 14px;
+      font-size: 24px;
+      margin: 14px 0 6px;
+    }
+
+    .cluster-heart {
+      animation: clusterBounce 1.5s infinite alternate ease-in-out;
+    }
+
+    .cluster-heart:nth-child(2) { animation-delay: 0.2s; }
+    .cluster-heart:nth-child(3) { animation-delay: 0.4s; }
+    .cluster-heart:nth-child(4) { animation-delay: 0.6s; }
+    .cluster-heart:nth-child(5) { animation-delay: 0.8s; }
+
+    @keyframes clusterBounce {
+      0% { transform: translateY(0) scale(1); }
+      100% { transform: translateY(-10px) scale(1.2); }
+    }
+
+    .finale-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      align-items: center;
+      margin-top: 10px;
+    }
+
+    @media (max-width: 480px) {
+      .journey-card {
+        padding: 20px 16px 18px;
+        border-radius: 22px;
+      }
+      .stage-title { font-size: 22px; }
+      .polaroid-deck { width: 240px; height: 310px; }
+      .polaroid-img-wrap { height: 200px; }
+      .scratch-front .card-hint { font-size: 14px; }
+      .scratch-badge { font-size: 10px; padding: 4px 8px; }
+      .scratch-back p { font-size: 14px; }
+    }
+
+    /* Floating Balloons & Celebration Atmosphere (Foreground Layer) */
+    #celebrationSky {
+      position: fixed;
+      inset: 0;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none !important;
+      z-index: 99999 !important; /* Always in front of cards and background blur */
+      overflow: hidden;
+    }
+
+    .floating-balloon {
+      position: absolute;
+      bottom: -120px;
+      pointer-events: none;
+      will-change: transform, bottom;
+      filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.16));
+    }
+
+    .balloon-body {
+      width: 48px;
+      height: 58px;
+      border-radius: 50% 50% 50% 50% / 40% 40% 60% 60%;
+      position: relative;
+      box-shadow: inset -4px -6px 12px rgba(0, 0, 0, 0.15), inset 4px 6px 12px rgba(255, 255, 255, 0.45);
+    }
+
+    .balloon-body::before {
+      content: '';
+      position: absolute;
+      top: 9px;
+      left: 11px;
+      width: 11px;
+      height: 20px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.75);
+      transform: rotate(-35deg);
+      filter: blur(0.5px);
+    }
+
+    .balloon-knot {
+      position: absolute;
+      bottom: -5px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 7px;
+      height: 6px;
+      background: inherit;
+      border-radius: 2px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+    }
+
+    .balloon-string {
+      position: absolute;
+      bottom: -48px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 1.5px;
+      height: 48px;
+      background: rgba(200, 180, 195, 0.75);
+      box-shadow: 0 0 2px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Heart balloon */
+    .heart-balloon {
+      font-size: 46px;
+      position: relative;
+      filter: drop-shadow(0 8px 18px rgba(255, 78, 131, 0.5));
+    }
+
+    .heart-balloon .balloon-string {
+      bottom: -40px;
+      height: 42px;
+      background: rgba(255, 105, 180, 0.6);
+    }
+
+    /* Floating Petal */
+    .floating-petal {
+      position: absolute;
+      top: -30px;
+      width: 18px;
+      height: 24px;
+      background: linear-gradient(135deg, #ffc0cb 0%, #ff6b8b 100%);
+      border-radius: 50% 0 50% 50%;
+      opacity: 0.9;
+      pointer-events: none;
+      filter: drop-shadow(0 4px 8px rgba(255, 105, 180, 0.35));
+    }
+  
+
+    /* FINAL MOBILE POSITION FIX — Didi Birthday Hero */
+    @media (max-width: 600px) {
+      /* Keep the interactive gift centered and fully visible */
+      .boxgift {
+        left: 50% !important;
+        top: 57% !important;
+        width: min(30vw, 105px) !important;
+        height: auto !important;
+        transform: translate(-50%, -50%) translate(0, 0) rotate(0deg) scale(var(--scale, 1)) !important;
+        z-index: 20 !important;
+      }
+
+      .boxgift .box-gift {
+        left: 50% !important;
+        width: 100% !important;
+        max-width: 105px !important;
+        object-fit: contain !important;
+      }
+
+      /* Keep the main heart near the top without clipping */
+      .heart1 {
+        width: min(42vw, 185px) !important;
+        height: min(42vw, 185px) !important;
+        top: 10vh !important;
+        bottom: auto !important;
+        right: 50% !important;
+        transform: translateX(50%) rotate(var(--rot, 0deg)) scale(var(--scale, 1)) !important;
+        object-fit: contain !important;
+        z-index: 4 !important;
+      }
+
+      /* Secondary heart stays subtle and does not overlap the main heart */
+      .heart2 {
+        width: min(22vw, 95px) !important;
+        height: min(22vw, 95px) !important;
+        top: 25vh !important;
+        bottom: auto !important;
+        right: 7vw !important;
+        object-fit: contain !important;
+        z-index: 2 !important;
+        opacity: .72 !important;
+      }
+
+      /* Prevent decorative corner artwork from covering the gift/heart */
+      .corner-image.bottom-left {
+        width: 64vw !important;
+        height: auto !important;
+        left: -12vw !important;
+        bottom: -2vh !important;
+      }
+
+      .corner-image-right.bottom-right {
+        width: 88vw !important;
+        height: auto !important;
+        right: -32vw !important;
+        bottom: -8vh !important;
+      }
+    }
+
+
+    /* ================= FINAL LAYOUT FIXES ================= */
+    /* Keep floating decorative hearts behind actual text/content. */
+    #celebrationSky {
+      z-index: 5 !important;
+    }
+
+    /* Keep memory photos fully visible instead of cropping them. */
+    .polaroid-img-wrap {
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      background: rgba(255, 245, 248, 0.95) !important;
+    }
+    .polaroid-img-wrap img {
+      width: 100% !important;
+      height: 100% !important;
+      object-fit: contain !important;
+      object-position: center !important;
+    }
+
+    /* Envelope card: center the greeting cleanly inside the card. */
+    #letterScene .card .text {
+      position: absolute !important;
+      inset: 12px 12px 30px 12px !important;
+      width: auto !important;
+      height: auto !important;
+      left: auto !important;
+      top: auto !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      text-align: center !important;
+      font-size: clamp(22px, 3vw, 29px) !important;
+      line-height: 1.05 !important;
+      padding: 0 8px !important;
+      z-index: 3 !important;
+    }
+    #letterScene .card .heart {
+      position: absolute !important;
+      top: auto !important;
+      left: 50% !important;
+      bottom: 12px !important;
+      margin: 0 !important;
+      transform: translateX(-50%) rotate(-45deg) !important;
+      z-index: 4 !important;
+    }
+
+    /* Letter popup: give the message its own safe area so decorations never sit on text. */
+    #letterScene .textLetter {
+      position: relative !important;
+      min-width: 0 !important;
+      padding: 12px 24px 42px !important;
+      overflow: hidden !important;
+    }
+    #letterScene .textLetter h2 {
+      margin: 0 0 8px !important;
+      line-height: 1.15 !important;
+      text-align: center !important;
+    }
+    #letterScene .textLetter .contentLetter {
+      width: 100% !important;
+      max-height: 185px !important;
+      margin: 0 !important;
+      padding: 0 8px 38px !important;
+      line-height: 1.25 !important;
+      overflow-y: auto !important;
+      text-align: center !important;
+    }
+    #letterScene .heartAnimation {
+      width: 78px !important;
+      bottom: 4px !important;
+      left: 50% !important;
+      transform: translateX(-50%) !important;
+      z-index: 1 !important;
+      pointer-events: none !important;
+      opacity: .8 !important;
+    }
+    #letterScene .signature {
+      bottom: 7px !important;
+      right: 18px !important;
+      font-size: 15px !important;
+      z-index: 6 !important;
+      background: rgba(255, 235, 235, .88) !important;
+      padding-left: 8px !important;
+    }
+
+    @media (max-width: 600px) {
+      #letterScene .card .text {
+        font-size: 23px !important;
+        inset: 10px 10px 28px 10px !important;
+      }
+      #letterScene .textLetter {
+        padding: 10px 12px 38px !important;
+      }
+      #letterScene .textLetter h2 {
+        font-size: 23px !important;
+      }
+      #letterScene .textLetter .contentLetter {
+        max-height: 145px !important;
+        padding: 0 5px 34px !important;
+        font-size: 15px !important;
+        line-height: 1.28 !important;
+      }
+      #letterScene .heartAnimation {
+        width: 62px !important;
+      }
+      #letterScene .signature {
+        font-size: 13px !important;
+        right: 12px !important;
+      }
+
+      /* Keep the memory stage comfortably inside the viewport. */
+      .polaroid-deck {
+        margin-top: 4px !important;
+        margin-bottom: 8px !important;
+      }
+      .polaroid-img-wrap {
+        height: 190px !important;
+      }
+    }
+
+/* ===== Separated from original HTML ===== */
+/* FINAL SAFE-AREA FIX: keep hero decorations completely inside viewport */
+@media (max-width: 600px) {
+  html, body { overflow: hidden !important; width: 100%; max-width: 100%; }
+
+  /* Gift: never touch/cross either viewport edge */
+  #giftBox.boxgift {
+    left: 50% !important;
+    right: auto !important;
+    top: 56% !important;
+    width: min(25vw, 92px) !important;
+    height: min(25vw, 92px) !important;
+    max-width: 92px !important;
+    max-height: 92px !important;
+    transform: translate(-50%, -50%) !important;
+  }
+  #giftBox .box-gift {
+    left: 50% !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    height: auto !important;
+    object-fit: contain !important;
+  }
+
+  /* Final safe sizing — keep the heart completely inside the screen */
+  img.heart1 {
+    left: 50% !important;
+    right: auto !important;
+    top: 8vh !important;
+    bottom: auto !important;
+    width: min(32vw, 145px) !important;
+    max-width: calc(100vw - 80px) !important;
+    height: auto !important;
+    object-fit: contain !important;
+    transform: translateX(-50%) rotate(var(--rot, 0deg)) scale(var(--scale, 1)) !important;
+    transform-origin: center center !important;
+  }
+
+  /* Keep the HBD/floral artwork fully visible with generous side margins */
+  .corner-image-right.bottom-right {
+    right: 4vw !important;
+    bottom: 2vh !important;
+    width: min(68vw, 360px) !important;
+    max-width: calc(100vw - 48px) !important;
+    height: auto !important;
+    max-height: 58vh !important;
+    object-fit: contain !important;
+    object-position: center center !important;
+  }
+
+  /* Decorative corner asset also gets safe margins */
+  .corner-image.bottom-left {
+    left: 2vw !important;
+    bottom: 1vh !important;
+    width: min(58vw, 300px) !important;
+    max-width: calc(100vw - 48px) !important;
+    height: auto !important;
+    object-fit: contain !important;
+  }
+  .bottom-left-right { display: none !important; }
+
+  /* Keep the hero heading inside the viewport */
+  .headline {
+    width: calc(100vw - 28px) !important;
+    max-width: calc(100vw - 28px) !important;
+    left: 50% !important;
+    padding: 0 8px !important;
+  }
+}
+
+/* ===== Separated from original HTML ===== */
+/* V5: move floral artwork upward and keep the envelope greeting unobstructed */
+.corner-image-right.bottom-right {
+  top: 10vh !important;
+  bottom: auto !important;
+  right: 4vw !important;
+  width: min(68vw, 360px) !important;
+  max-width: calc(100vw - 48px) !important;
+  height: auto !important;
+  max-height: 58vh !important;
+  object-fit: contain !important;
+  object-position: center center !important;
+}
+
+/* The envelope already has enough decoration; remove the center heart so it never sits over text. */
+#letterScene .card .heart {
+  display: none !important;
+}
+
+/* Give the envelope greeting a little more breathing room. */
+#letterScene .card .text {
+  inset: 10px 12px 18px 12px !important;
+  z-index: 12 !important;
+  line-height: 1.08 !important;
+}
+
+@media (max-width: 600px) {
+  .corner-image-right.bottom-right {
+    top: 7vh !important;
+    right: 3vw !important;
+    width: min(76vw, 340px) !important;
+    max-width: calc(100vw - 30px) !important;
+    max-height: 52vh !important;
+  }
+
+  #letterScene .card .text {
+    inset: 10px 10px 16px 10px !important;
+    font-size: 22px !important;
+    line-height: 1.06 !important;
+  }
+}
+
+/* ===== Final mobile positioning pass ===== */
+@media (max-width: 600px) {
+  .background-image {
+    inset: 0;
+    width: 100vw;
+    height: 100vh;
+    object-fit: cover;
+    object-position: center center;
+  }
+
+  .headline {
+    top: 9%;
+    left: 50%;
+    width: 94vw;
+    padding: 0 3vw;
+    font-size: clamp(24px, 7.6vw, 42px);
+    line-height: 1.12;
+    z-index: 20;
+  }
+
+  /* Keep the main floral illustration fully inside the viewport. */
+  .corner-image.bottom-left {
+    width: 94vw;
+    height: 54vh;
+    left: 3vw;
+    bottom: -2vh;
+    object-fit: contain;
+    object-position: center bottom;
+    z-index: 2;
+  }
+
+  /* The duplicate rotated floral layer was creating the misplaced tree/flower copy. */
+  .bottom-left-right {
+    display: none !important;
+  }
+
+  .corner-image-right.bottom-right {
+    width: 78vw;
+    height: 48vh;
+    right: -5vw;
+    bottom: -3vh;
+    object-fit: contain;
+    object-position: right bottom;
+    z-index: 3;
+  }
+
+  /* Winged heart: smaller and safely inside the upper-middle area. */
+  .heart2 {
+    width: 29vw;
+    height: 29vw;
+    left: 10vw;
+    right: auto;
+    bottom: 46vh;
+    z-index: 6;
+  }
+
+  /* HBD heart: keep it clear of the heading and floral artwork. */
+  .heart1 {
+    width: 25vw;
+    height: 25vw;
+    right: 8vw;
+    bottom: 44vh;
+    z-index: 6;
+  }
+
+  .boxgift {
+    width: min(28vw, 86px);
+    top: 62%;
+    z-index: 12;
+  }
+}
+
+/* Small phones: add a little more vertical breathing room. */
+@media (max-width: 390px) {
+  .headline { top: 8%; font-size: clamp(22px, 7.5vw, 36px); }
+  .corner-image.bottom-left { width: 96vw; left: 2vw; height: 52vh; }
+  .corner-image-right.bottom-right { width: 76vw; right: -4vw; height: 45vh; }
+  .heart2 { width: 28vw; height: 28vw; left: 9vw; bottom: 45vh; }
+  .heart1 { width: 24vw; height: 24vw; right: 7vw; bottom: 43vh; }
+}
+
+/* ================= V7 POSITION FIX ================= */
+@media (max-width: 600px) {
+  /* Put the animated heart/GIF clearly in the foreground. */
+  #letterScene .heartAnimation {
+    z-index: 30 !important;
+  }
+
+  #letterScene .heartAnimation img {
+    position: relative !important;
+    z-index: 31 !important;
+  }
+
+  /* Move the large grass/tree-style floral artwork farther down. */
+  .corner-image.bottom-left {
+    bottom: -16vh !important;
+    width: 94vw !important;
+    height: 58vh !important;
+    left: 3vw !important;
+    object-fit: contain !important;
+    object-position: center bottom !important;
+    z-index: 2 !important;
+  }
+}
+
+@media (max-width: 390px) {
+  .corner-image.bottom-left {
+    bottom: -18vh !important;
+    width: 96vw !important;
+    height: 58vh !important;
+    left: 2vw !important;
+  }
+}
+
+
+/* ================= FINAL FIX: keep the envelope greeting fully inside the card ================= */
+/* This is the last rule for this selector on purpose, so it wins over every earlier patch above. */
+#letterScene .card {
+  overflow: hidden !important;
+  box-sizing: border-box !important;
+}
+
+/* Keep the card perfectly centered inside the envelope regardless of any
+   fixed-pixel math elsewhere, and keep its dotted border symmetric. */
+#letterScene .card {
+  left: 50% !important;
+  margin-left: -135px !important;
+}
+
+#letterScene .card:before {
+  left: 15px !important;
+  width: 240px !important;
+}
+
+/* Hide the greeting while the paper is resting inside the envelope, and only
+   reveal it once the paper is actually pulled up and out. */
+#letterScene .card .text {
+  opacity: 0 !important;
+  transition: opacity .25s ease .05s !important;
+  pointer-events: none !important;
+}
+
+#letterScene .valentines.is-open .card .text,
+#letterScene .valentines:hover .card .text {
+  opacity: 1 !important;
+}
+
+#letterScene .card .text {
+  position: absolute !important;
+  inset: 14px 16px 14px 16px !important;
+  width: auto !important;
+  height: auto !important;
+  left: auto !important;
+  top: auto !important;
+  right: auto !important;
+  bottom: auto !important;
+  box-sizing: border-box !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  text-align: center !important;
+  font-family: 'Brush Script MT', cursive !important;
+  font-size: clamp(15px, 5.2vw, 22px) !important;
+  line-height: 1.18 !important;
+  overflow-wrap: break-word !important;
+  word-break: break-word !important;
+  white-space: normal !important;
+  padding: 0 !important;
+  z-index: 12 !important;
+}
+
+/* Shrink the whole envelope proportionally on narrow phones so nothing (text included)
+   can ever spill past its visible edges — text scales down together with its box. */
+@media (max-width: 400px) {
+  #letterScene #castle {
+    transform: scale(0.86);
+    transform-origin: center center;
+  }
+}
+
+@media (max-width: 340px) {
+  #letterScene #castle {
+    transform: scale(0.74);
+  }
+}
+
+/* ================= LOCK SCREEN ================= */
+#lockScreen {
+  position: fixed;
+  inset: 0;
+  z-index: 999999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(circle at 50% 30%, #bcd8f4 0%, #7aa8d6 45%, #3f6fa8 100%);
+  padding: 24px;
+  box-sizing: border-box;
+}
+
+#lockScreen.is-unlocked {
+  display: none !important;
+}
+
+#lockScreen .lock-card {
+  width: 100%;
+  max-width: 340px;
+  background: rgba(255, 255, 255, 0.85);
+  border-radius: 26px;
+  padding: 32px 24px 28px;
+  box-shadow: 0 18px 45px rgba(214, 40, 40, 0.25);
+  text-align: center;
+  box-sizing: border-box;
+  animation: lockPop .5s ease;
+}
+
+@keyframes lockPop {
+  0% { transform: scale(0.85); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+#lockScreen .lock-cat {
+  width: 110px;
+  height: 110px;
+  object-fit: cover;
+  border-radius: 50%;
+  border: 4px solid #fff;
+  box-shadow: 0 8px 20px rgba(214, 40, 40, 0.3);
+  margin: 0 auto 6px;
+  display: block;
+}
+
+#lockScreen .lock-icon {
+  width: 38px;
+  height: 38px;
+  object-fit: contain;
+  margin: -22px auto 14px;
+  display: block;
+  filter: drop-shadow(0 4px 6px rgba(0,0,0,.25));
+}
+
+#lockScreen h2 {
+  margin: 0 0 6px;
+  font-family: 'Dancing Script', cursive;
+  font-size: 26px;
+  color: #d62828;
+}
+
+#lockScreen p.lock-hint {
+  margin: 0 0 18px;
+  font-family: system-ui, sans-serif;
+  font-size: 13px;
+  color: #7a3b3b;
+  opacity: .85;
+}
+
+#lockScreen .lock-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+#lockScreen input[type="password"],
+#lockScreen input[type="text"] {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 12px 16px;
+  border-radius: 14px;
+  border: 2px solid #f4978e;
+  font-size: 16px;
+  text-align: center;
+  outline: none;
+  font-family: system-ui, sans-serif;
+  background: #fff;
+  color: #333;
+}
+
+#lockScreen input:focus {
+  border-color: #d62828;
+}
+
+#lockScreen button.lock-submit {
+  border: none;
+  border-radius: 14px;
+  padding: 12px 16px;
+  font-size: 16px;
+  font-weight: 600;
+  font-family: system-ui, sans-serif;
+  color: #fff;
+  background: linear-gradient(135deg, #f08080, #d62828);
+  cursor: pointer;
+  transition: transform .15s ease;
+}
+
+#lockScreen button.lock-submit:active {
+  transform: scale(0.96);
+}
+
+#lockScreen .lock-error {
+  min-height: 18px;
+  font-family: system-ui, sans-serif;
+  font-size: 13px;
+  color: #b00020;
+  margin: 0;
+}
+
+#lockScreen.shake .lock-card {
+  animation: lockShake .45s ease;
+}
+
+@keyframes lockShake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-10px); }
+  40% { transform: translateX(9px); }
+  60% { transform: translateX(-6px); }
+  80% { transform: translateX(4px); }
+}
+
+body.lock-active {
+  overflow: hidden !important;
+}
+
+/* ================= COUNTDOWN TIMER SCREEN ================= */
+#timerScreen {
+  position: fixed;
+  inset: 0;
+  z-index: 999998;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(circle at 50% 25%, #eaf4ff 0%, #a9cdec 45%, #3f6fa8 100%);
+  padding: 24px;
+  box-sizing: border-box;
+}
+
+#timerScreen.is-visible {
+  display: flex;
+}
+
+#timerScreen .timer-card {
+  width: 100%;
+  max-width: 360px;
+  background: rgba(240, 248, 255, 0.90);
+  border-radius: 26px;
+  padding: 26px 22px 28px;
+  box-shadow: 0 18px 45px rgba(10, 30, 60, 0.28);
+  text-align: center;
+  box-sizing: border-box;
+  animation: lockPop .5s ease;
+}
+
+#timerScreen .timer-calendar {
+  width: 92px;
+  height: auto;
+  margin: 0 auto 8px;
+  display: block;
+  filter: drop-shadow(0 8px 14px rgba(20, 60, 110, .25));
+}
+
+#timerScreen h2 {
+  margin: 0 0 12px;
+  font-family: 'Dancing Script', cursive;
+  font-size: 24px;
+  line-height: 1.25;
+  color: #2f6fb0;
+}
+
+#timerScreen .timer-decor {
+  display: flex;
+  justify-content: center;
+  gap: 22px;
+  margin-bottom: 16px;
+}
+
+#timerScreen .timer-deco-icon {
+  width: 46px;
+  height: 46px;
+  object-fit: contain;
+  animation: timerFloat 2.6s ease-in-out infinite;
+}
+
+#timerScreen .timer-deco-icon:nth-child(2) {
+  animation-delay: .4s;
+}
+
+@keyframes timerFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
+#timerScreen .timer-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+#timerScreen .timer-unit {
+  background: linear-gradient(135deg, #5fa8e0, #2f6fb0);
+  border-radius: 14px;
+  padding: 10px 4px;
+  color: #fff;
+  box-shadow: 0 6px 14px rgba(20, 60, 110, .3);
+}
+
+#timerScreen .timer-unit span {
+  display: block;
+  font-family: system-ui, sans-serif;
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+#timerScreen .timer-unit label {
+  display: block;
+  font-family: system-ui, sans-serif;
+  font-size: 10px;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  opacity: .9;
+  margin-top: 2px;
+}
+
+#timerScreen .timer-sub {
+  margin: 0 0 18px;
+  font-family: system-ui, sans-serif;
+  font-size: 13px;
+  color: #39536e;
+  opacity: .85;
+}
+
+#timerScreen .timer-continue {
+  border: none;
+  border-radius: 14px;
+  padding: 12px 18px;
+  font-size: 16px;
+  font-weight: 600;
+  font-family: system-ui, sans-serif;
+  color: #4a2c04;
+  background: linear-gradient(135deg, #ffbf6b, #f2994a);
+  cursor: pointer;
+  width: 100%;
+  transition: transform .15s ease;
+}
+
+#timerScreen .timer-continue:active {
+  transform: scale(0.96);
+}
+
+#timerScreen.is-birthday .timer-continue {
+  animation: timerPulse 1.3s ease-in-out infinite;
+}
+
+@keyframes timerPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
+@media (max-width: 360px) {
+  #timerScreen .timer-unit span { font-size: 18px; }
+  #timerScreen h2 { font-size: 21px; }
+}
+
+/* ================= FINAL HERO SCENE RECOMPOSITION ================= */
+/* Cleaner, intentional placement: roses framing both bottom corners,
+   gift box + winged heart grouped together in the open middle space. */
+.headline {
+  top: 12vh !important;
+  width: min(92vw, 900px) !important;
+}
+
+.corner-image.bottom-left {
+  top: auto !important;
+  left: -4vw !important;
+  bottom: -2vh !important;
+  width: min(46vw, 420px) !important;
+  height: auto !important;
+  max-height: 46vh !important;
+  object-fit: contain !important;
+  object-position: left bottom !important;
+  z-index: 2 !important;
+}
+
+.corner-image-right.bottom-right {
+  top: auto !important;
+  bottom: -2vh !important;
+  right: -4vw !important;
+  width: min(46vw, 420px) !important;
+  height: auto !important;
+  max-height: 46vh !important;
+  object-fit: contain !important;
+  object-position: right bottom !important;
+  z-index: 2 !important;
+}
+
+.bottom-left-right {
+  display: none !important;
+}
+
+.boxgift {
+  top: 55% !important;
+  left: 50% !important;
+  width: min(15vw, 150px) !important;
+  z-index: 5 !important;
+}
+
+.heart2 {
+  top: auto !important;
+  bottom: 41vh !important;
+  right: auto !important;
+  left: 59% !important;
+  width: min(11vw, 110px) !important;
+  height: min(11vw, 110px) !important;
+  z-index: 5 !important;
+}
+
+.heart1 {
+  top: auto !important;
+  bottom: 6vh !important;
+  right: 4vw !important;
+  left: auto !important;
+  width: min(20vw, 180px) !important;
+  height: min(20vw, 180px) !important;
+  z-index: 2 !important;
+}
+
+@media (max-width: 600px) {
+  .headline {
+    top: calc(9% + env(safe-area-inset-top, 0px)) !important;
+  }
+
+  .corner-image.bottom-left {
+    left: -6vw !important;
+    bottom: -2vh !important;
+    width: 62vw !important;
+    max-height: 40vh !important;
+  }
+
+  .corner-image-right.bottom-right {
+    right: -6vw !important;
+    bottom: -2vh !important;
+    width: 62vw !important;
+    max-height: 40vh !important;
+  }
+
+  .boxgift {
+    top: 58% !important;
+    left: 50% !important;
+    width: min(24vw, 92px) !important;
+  }
+
+  .heart2 {
+    bottom: 38vh !important;
+    left: 60% !important;
+    width: min(20vw, 90px) !important;
+    height: min(20vw, 90px) !important;
+  }
+
+  .heart1 {
+    bottom: 4vh !important;
+    right: 3vw !important;
+    width: min(30vw, 140px) !important;
+    height: min(30vw, 140px) !important;
+  }
+}
+
+/* ================= ENVELOPE CURVED GREETING: keep it fully on-screen ================= */
+/* Smaller footprint + smaller glyphs = far less chance of the curved
+   "Happy Birthday...Priy Didu!" text swinging past the viewport edges. */
+#theSvg {
+  width: 58% !important;
+  height: auto !important;
+  aspect-ratio: 240 / 180;
+  overflow: visible !important;
+}
+
+#letterScene text {
+  font-size: 7px !important;
+}
+
+@media (max-width: 600px) {
+  #theSvg {
+    width: 68% !important;
+  }
+
+  #letterScene text {
+    font-size: 6px !important;
+  }
+}
+
+/* ================= GIFT BOX: sit closed until tapped ================= */
+/* Best-effort re-anchor of the lid so it rests snugly on the base by default
+   (no visible gap/tilt) instead of already looking opened. Exact value depends
+   on the transparent padding baked into nap.png/hop.png, so nudge this if it's
+   still not perfectly flush once you see it live. */
+.boxgift .lid {
+  bottom: 55% !important;
+}
+
+/* Keep it visibly closed (no rotation/lift) until the .open class is added by the tap handler. */
+.boxgift:not(.open) .lid {
+  transform: translateX(-50%) translateY(0) rotate(0deg) !important;
+}
+
+/* ================= HEADLINE: readable shadow over the busy background ================= */
+.headline {
+  text-shadow:
+    0 2px 4px rgba(120, 10, 50, 0.35),
+    0 6px 18px rgba(120, 10, 50, 0.3) !important;
+}
+
+
+/* ==========================================================================
+   V8 UPDATE
+   1) Headline sits lower so it is clear of the vines / fairy-light garland
+   2) Gift box is bigger
+   3) Lock + Countdown screens use the SAME background image as the hero page
+      (letter + journey pages already sit on it, blurred, via .background-image)
+
+   To change the background image for every page, edit --page-bg below.
+   To change how soft the blurred pages look, edit --page-bg-blur (0px = sharp).
+   ========================================================================== */
+:root {
+  --page-bg: url('../image/background.png');
+  --page-bg-blur: 8px;
+  --gift-size: min(22vw, 240px);
+  --gift-top: 55%;
+  --gift-left: 48.5%; /* nudged left so a bigger box doesn't touch the winged heart in the artwork */
+}
+
+@media (max-width: 600px) {
+  :root {
+    --gift-size: min(38vw, 150px);
+    --gift-top: 57%;
+    --gift-left: 50%;
+  }
+}
+
+/* ---- 1) Headline lower ---- */
+.headline {
+  top: 23vh !important;
+  text-wrap: balance; /* even line lengths, no lonely last word */
+}
+
+@media (max-width: 600px) {
+  .headline {
+    top: calc(15% + env(safe-area-inset-top, 0px)) !important;
+  }
+}
+
+/* ---- 2) Bigger gift box ----
+   Uses #giftBox.boxgift so it wins over the older per-breakpoint patches above. */
+#giftBox.boxgift {
+  top: var(--gift-top) !important;
+  left: var(--gift-left) !important;
+  width: var(--gift-size) !important;
+  height: var(--gift-size) !important;
+  max-width: none !important;
+  max-height: none !important;
+}
+
+/* ---- 3) One shared background for every screen ---- */
+#lockScreen,
+#timerScreen {
+  overflow: hidden;
+  isolation: isolate;
+}
+
+/* the image, softly blurred (same blur as the journey pages) */
+#lockScreen::before,
+#timerScreen::before {
+  content: '';
+  position: absolute;
+  inset: calc(var(--page-bg-blur) * -3);
+  background: var(--page-bg) center / cover no-repeat;
+  filter: blur(var(--page-bg-blur));
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* Sky-blue tint (matches the lock screen's video theme) instead of the
+   pink tint the other journey pages use. */
+#lockScreen::after,
+#timerScreen::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at center, rgba(225, 240, 255, 0.45) 0%, rgba(150, 195, 240, 0.30) 60%, rgba(8, 22, 46, 0.45) 100%);
+  z-index: 0;
+  pointer-events: none;
+}
+
+#lockScreen .lock-card,
+#timerScreen .timer-card {
+  position: relative;
+  z-index: 1;
+}
+
+/* journey pages: same blur value, driven by the shared variable (still 8px) */
+.journey-backdrop {
+  backdrop-filter: blur(var(--page-bg-blur));
+  -webkit-backdrop-filter: blur(var(--page-bg-blur));
+}
+
+/* Laptop / desktop screens: keep the headline to two clean lines so it never
+   runs into the gift box or gets cut off at the top. */
+@media (min-width: 1025px) {
+  .headline {
+    width: min(92vw, 1200px) !important;
+    font-size: clamp(44px, 4.2vw, 84px) !important;
+    top: 22vh !important;
+  }
+}
+
+/* ===== USER REQUEST: smaller envelope + perfectly centered greeting ===== */
+#letterScene .valentines {
+  zoom: 0.86;
+}
+
+#letterScene .card .text {
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  padding: 0 12px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  text-align: center !important;
+  box-sizing: border-box !important;
+  font-size: clamp(17px, 5.2vw, 23px) !important;
+  line-height: 1.15 !important;
+}
+
+@media (max-width: 600px) {
+  #letterScene .valentines {
+    zoom: 0.86;
+  }
+
+  #letterScene .card .text {
+    inset: 0 !important;
+    padding: 0 10px !important;
+    font-size: 22px !important;
+    line-height: 1.12 !important;
+  }
+}
+
+/* ===== FINAL: slightly smaller envelope so the winged heart remains visible ===== */
+#letterScene .valentines {
+  zoom: 0.80 !important;
+}
+
+@media (max-width: 600px) {
+  #letterScene .valentines {
+    zoom: 0.80 !important;
+  }
+
+  /* Make the winged heart a little more visible behind the envelope. */
+  .heart2 {
+    width: 34vw !important;
+    height: 34vw !important;
+    left: 8vw !important;
+    bottom: 44vh !important;
+  }
+}
+
+/* ===== Background heart: slightly bigger ===== */
+.heart2 {
+  width: min(24vw, 290px) !important;
+  height: min(24vw, 290px) !important;
+}
+
+/* ===== Mewmew cats: bring to front ===== */
+#letterScene .mewmew1,
+#letterScene .mewmew1 img {
+  position: absolute;
+  z-index: 130 !important;
+}
+
+/* Keep the second Mewmew at its original stacking position */
+#letterScene .mewmew2,
+#letterScene .mewmew2 img {
+  position: absolute;
+  z-index: auto !important;
+}
+
+
+/* ===== MEWMEW: LEFT & RIGHT ON LETTER CARD ===== */
+
+/* Left Mewmew */
+#letterScene .mewmew1 {
+  width: 58px !important;
+  left: 8px !important;
+  right: auto !important;
+  bottom: 12px !important;
+  z-index: 130 !important;
+}
+
+/* Right Mewmew */
+#letterScene .mewmew2 {
+  width: 58px !important;
+  right: 8px !important;
+  left: auto !important;
+  bottom: 12px !important;
+  z-index: 130 !important;
+}
+
+#letterScene .mewmew1 img,
+#letterScene .mewmew2 img {
+  width: 100% !important;
+}
+
+/* ===== MEWMEW: INSIDE THE LETTER BOX ===== */
+#letterScene .mewmew1,
+#letterScene .mewmew2 {
+  width: 52px !important;
+  bottom: 18px !important;
+  z-index: 130 !important;
+}
+
+#letterScene .mewmew1 {
+  left: 14px !important;
+  right: auto !important;
+}
+
+#letterScene .mewmew2 {
+  right: 14px !important;
+  left: auto !important;
+}
+
+#letterScene .mewmew1 img,
+#letterScene .mewmew2 img {
+  width: 100% !important;
+}
+
+
+
+/* ==========================================================
+   FINAL CLEAN VIDEO PASSWORD LOCK
+   This block is intentionally LAST.
+   The rest of the birthday website remains intact underneath.
+   ========================================================== */
+
+body.lock-active {
+  overflow: hidden !important;
+}
+
+body.lock-active #lockScreen {
+  position: fixed !important;
+  inset: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  min-width: 100vw !important;
+  min-height: 100vh !important;
+  z-index: 999999 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  overflow: hidden !important;
+  padding: 0 !important;
+  box-sizing: border-box !important;
+  background: #3f6fa8 !important;
+}
+
+/* Completely replace the old pseudo-background image. */
+body.lock-active #lockScreen::before,
+body.lock-active #lockScreen::after {
+  content: none !important;
+  display: none !important;
+}
+
+/* The uploaded video is the ONLY lock-page background. */
+body.lock-active #lockScreen .lock-video {
+  position: absolute !important;
+  inset: 0 !important;
+  z-index: 0 !important;
+  display: block !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  min-width: 100% !important;
+  min-height: 100% !important;
+  object-fit: cover !important;
+  object-position: center center !important;
+  background: #3f6fa8 !important;
+  pointer-events: none !important;
+}
+
+/* A light veil only for readability; it does NOT replace the video.
+   Tuned to the sky-blue / sunlit-field tones of the loding_lock video. */
+body.lock-active #lockScreen .lock-video-overlay {
+  position: absolute !important;
+  inset: 0 !important;
+  z-index: 1 !important;
+  pointer-events: none !important;
+  background:
+    radial-gradient(circle at 50% 40%, rgba(255,244,214,.10), transparent 45%),
+    linear-gradient(180deg, rgba(150,195,240,.10), rgba(8,26,52,.32)) !important;
+}
+
+/* Hide the entire original website visually only while the lock is active.
+   It will reappear automatically when the lock is removed. */
+body.lock-active > .background-image,
+body.lock-active > .headline,
+body.lock-active > #letterScene,
+body.lock-active > #birthdayJourneyContainer,
+body.lock-active > #giftBox,
+body.lock-active > #celebrationSky,
+body.lock-active > .corner-image,
+body.lock-active > .corner-image-right,
+body.lock-active > .bottom-left-right,
+body.lock-active > .heart1,
+body.lock-active > .heart2 {
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+/* Full-bleed iPhone-style lock screen: no card chrome, content floats
+   directly over the video wallpaper, like the real iOS lock screen. */
+body.lock-active #lockScreen .lock-card {
+  position: relative !important;
+  z-index: 2 !important;
+  width: 100% !important;
+  max-width: 430px !important;
+  height: 100% !important;
+  max-height: 100vh !important;
+  margin: 0 !important;
+  padding: 64px 28px 40px !important;
+  box-sizing: border-box !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  text-align: center !important;
+  animation: finalLockIn .65s cubic-bezier(.2,.8,.2,1) both !important;
+}
+
+@keyframes finalLockIn {
+  from { opacity: 0; transform: translateY(16px) scale(.985); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+body.lock-active #lockScreen .lock-content {
+  position: relative !important;
+  z-index: 2 !important;
+  width: 100% !important;
+  height: 100% !important;
+  margin: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  text-align: center !important;
+}
+
+/* Old padlock graphic + cursive "our little secret" line are not part of
+   the iOS look — retired in favor of the clock + "Enter Passcode" title. */
+body.lock-active #lockScreen .lock-lock-icon,
+body.lock-active #lockScreen .lock-eyebrow {
+  display: none !important;
+}
+
+/* ---- iOS-style clock ---- */
+body.lock-active #lockScreen .lock-clock {
+  margin-top: 5vh !important;
+}
+
+body.lock-active #lockScreen .lock-time {
+  display: block !important;
+  color: #fff !important;
+  font-family: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif !important;
+  font-weight: 300 !important;
+  font-size: clamp(56px, 16vw, 92px) !important;
+  line-height: 1 !important;
+  letter-spacing: -.02em !important;
+  text-shadow: 0 4px 20px rgba(0,0,0,.35) !important;
+}
+
+body.lock-active #lockScreen .lock-date {
+  display: block !important;
+  margin-top: 6px !important;
+  color: rgba(255,255,255,.92) !important;
+  font-family: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif !important;
+  font-weight: 500 !important;
+  font-size: 17px !important;
+  letter-spacing: .01em !important;
+  text-shadow: 0 2px 10px rgba(0,0,0,.30) !important;
+}
+
+/* ---- Passcode sheet (bottom half, like the swiped-up iOS passcode view) ---- */
+body.lock-active #lockScreen .lock-passcode {
+  width: 100% !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+}
+
+body.lock-active #lockScreen .lock-passcode-title {
+  margin: 0 0 6px !important;
+  color: #fff !important;
+  font-family: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif !important;
+  font-weight: 600 !important;
+  font-size: 19px !important;
+  letter-spacing: .01em !important;
+  text-shadow: 0 2px 10px rgba(0,0,0,.30) !important;
+}
+
+body.lock-active #lockScreen .lock-hint {
+  margin: 0 0 20px !important;
+  color: rgba(255,255,255,.82) !important;
+  font-family: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif !important;
+  font-weight: 400 !important;
+  font-size: 13px !important;
+  line-height: 1.3 !important;
+  letter-spacing: .01em !important;
+  text-shadow: 0 2px 8px rgba(0,0,0,.25) !important;
+}
+
+/* Dots: small hollow circles that fill solid — exactly like the real
+   iOS passcode dots (the digit itself is never shown). */
+body.lock-active #lockScreen .lock-pin-dots {
+  display: flex !important;
+  justify-content: center !important;
+  gap: 18px !important;
+  margin: 0 0 30px !important;
+}
+
+body.lock-active #lockScreen .lock-pin-dots span {
+  display: block !important;
+  width: 14px !important;
+  height: 14px !important;
+  margin: 0 !important;
+  border-radius: 50% !important;
+  background: transparent !important;
+  border: 1.5px solid rgba(255,255,255,.85) !important;
+  box-shadow: none !important;
+  font-size: 0 !important;
+  color: transparent !important;
+  transition: transform .15s ease, background .15s ease !important;
+}
+
+body.lock-active #lockScreen .lock-pin-dots span.filled {
+  background: #fff !important;
+  border-color: #fff !important;
+  transform: scale(1.08) !important;
+  box-shadow: 0 0 8px rgba(255,255,255,.65) !important;
+}
+
+/* Keypad: circular translucent buttons, digit + letters, true iOS 3x4 layout */
+body.lock-active #lockScreen .lock-keypad {
+  display: grid !important;
+  grid-template-columns: repeat(3, 74px) !important;
+  gap: 22px !important;
+  justify-content: center !important;
+  width: max-content !important;
+  margin: 0 auto 24px !important;
+}
+
+body.lock-active #lockScreen .lock-key,
+body.lock-active #lockScreen .lock-key-spacer,
+body.lock-active #lockScreen .lock-backspace {
+  width: 74px !important;
+  height: 74px !important;
+  min-width: 74px !important;
+  min-height: 74px !important;
+}
+
+body.lock-active #lockScreen .lock-key {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  border: none !important;
+  border-radius: 50% !important;
+  background: rgba(255,255,255,.16) !important;
+  color: #fff !important;
+  cursor: pointer !important;
+  -webkit-tap-highlight-color: transparent !important;
+  transition: background .12s ease, transform .12s ease !important;
+}
+
+body.lock-active #lockScreen .lock-key .lock-key-num {
+  font-family: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif !important;
+  font-size: 30px !important;
+  font-weight: 400 !important;
+  line-height: 1 !important;
+}
+
+body.lock-active #lockScreen .lock-key .lock-key-letters {
+  display: block !important;
+  margin-top: 2px !important;
+  font-family: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif !important;
+  font-size: 9px !important;
+  font-weight: 600 !important;
+  letter-spacing: .12em !important;
+  color: rgba(255,255,255,.88) !important;
+}
+
+body.lock-active #lockScreen .lock-key:active {
+  background: rgba(255,255,255,.42) !important;
+  transform: scale(.96) !important;
+}
+
+body.lock-active #lockScreen .lock-key-spacer {
+  display: block !important;
+  background: transparent !important;
+}
+
+body.lock-active #lockScreen .lock-backspace {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border: none !important;
+  border-radius: 50% !important;
+  background: transparent !important;
+  color: #fff !important;
+  font-size: 24px !important;
+  cursor: pointer !important;
+  -webkit-tap-highlight-color: transparent !important;
+}
+
+body.lock-active #lockScreen .lock-backspace:active {
+  opacity: .55 !important;
+}
+
+/* Real iOS unlocks automatically once the 4th digit lands — the manual
+   button is kept in the DOM (script.js needs the element) but hidden. */
+body.lock-active #lockScreen .lock-submit {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0,0,0,0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
+body.lock-active #lockScreen .lock-error {
+  min-height: 16px !important;
+  margin: 2px 0 0 !important;
+  color: #ffb4b4 !important;
+  font-family: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif !important;
+  font-size: 12px !important;
+  font-weight: 500 !important;
+}
+
+/* Prevent any obsolete cat/icon rules from creating anything on the lock page. */
+body.lock-active #lockScreen .lock-cat,
+body.lock-active #lockScreen .lock-icon {
+  display: none !important;
+}
+
+/* Small phones: shrink the keypad + clock instead of scaling the whole page. */
+@media (max-width: 380px) {
+  body.lock-active #lockScreen .lock-keypad {
+    grid-template-columns: repeat(3, 64px) !important;
+    gap: 14px !important;
+  }
+  body.lock-active #lockScreen .lock-key,
+  body.lock-active #lockScreen .lock-key-spacer,
+  body.lock-active #lockScreen .lock-backspace {
+    width: 64px !important;
+    height: 64px !important;
+    min-width: 64px !important;
+    min-height: 64px !important;
+  }
+  body.lock-active #lockScreen .lock-time {
+    font-size: clamp(46px, 15vw, 68px) !important;
+  }
+}
+
+@media (max-height: 650px) {
+  body.lock-active #lockScreen .lock-card {
+    padding: 36px 24px 22px !important;
+  }
+  body.lock-active #lockScreen .lock-clock {
+    margin-top: 1.5vh !important;
+  }
+  body.lock-active #lockScreen .lock-pin-dots {
+    margin-bottom: 22px !important;
+  }
+}
+
+@media (orientation: landscape) and (max-height: 500px) {
+  body.lock-active #lockScreen .lock-card {
+    flex-direction: row !important;
+    justify-content: space-around !important;
+    align-items: center !important;
+    padding: 16px !important;
+  }
+  body.lock-active #lockScreen .lock-content {
+    flex-direction: row !important;
+    justify-content: space-around !important;
+  }
+  body.lock-active #lockScreen .lock-clock {
+    margin-top: 0 !important;
+  }
+  body.lock-active #lockScreen .lock-keypad {
+    grid-template-columns: repeat(3, 52px) !important;
+    gap: 10px !important;
+    margin-bottom: 0 !important;
+  }
+  body.lock-active #lockScreen .lock-key,
+  body.lock-active #lockScreen .lock-key-spacer,
+  body.lock-active #lockScreen .lock-backspace {
+    width: 52px !important;
+    height: 52px !important;
+    min-width: 52px !important;
+    min-height: 52px !important;
+  }
+}
+
+/* ---- Lock screen feedback: wrong / correct / lockout ---- */
+@keyframes dotsShake {
+  0%, 100% { transform: translateX(0); }
+  15% { transform: translateX(-14px); }
+  30% { transform: translateX(12px); }
+  45% { transform: translateX(-10px); }
+  60% { transform: translateX(8px); }
+  75% { transform: translateX(-5px); }
+  90% { transform: translateX(3px); }
+}
+
+body.lock-active #lockScreen .lock-pin-dots.is-wrong {
+  animation: dotsShake .55s cubic-bezier(.36,.07,.19,.97) both !important;
+}
+
+body.lock-active #lockScreen .lock-pin-dots.is-wrong span {
+  background: #ff6b6b !important;
+  border-color: #ff6b6b !important;
+  box-shadow: 0 0 10px rgba(255,107,107,.75) !important;
+}
+
+@keyframes dotsGlow {
+  0%, 100% { transform: scale(1.08); }
+  50% { transform: scale(1.35); }
+}
+
+body.lock-active #lockScreen .lock-pin-dots.is-correct span {
+  background: #ffd27a !important;
+  border-color: #ffd27a !important;
+  box-shadow: 0 0 14px rgba(255,210,122,.9) !important;
+  animation: dotsGlow .5s ease-in-out !important;
+}
+
+body.lock-active #lockScreen .lock-keypad.is-locked {
+  opacity: .4 !important;
+  pointer-events: none !important;
+  transition: opacity .3s ease !important;
+}
+
+@keyframes lockOut {
+  to { opacity: 0; transform: translateY(-46px) scale(1.03); }
+}
+
+body.lock-active #lockScreen.is-unlocking {
+  opacity: 0;
+  transition: opacity .55s ease .05s;
+}
+
+body.lock-active #lockScreen.is-unlocking .lock-card {
+  animation: lockOut .55s ease forwards !important;
+}
+
+body.lock-active #lockScreen .lock-error {
+  font-size: 13px !important;
+}
+
+/* ---- Lock stages: sleep -> WhatsApp notification -> passcode ---- */
+body.lock-active #lockScreen .lock-video {
+  transition: filter .9s ease !important;
+}
+
+body.lock-active #lockScreen.stage-sleep .lock-video {
+  filter: brightness(.38) !important;
+}
+
+body.lock-active #lockScreen .lock-clock {
+  transition: opacity .8s ease !important;
+}
+
+body.lock-active #lockScreen.stage-sleep .lock-clock {
+  opacity: .6 !important;
+}
+
+/* passcode sheet stays hidden until the notification is opened */
+body.lock-active #lockScreen .lock-passcode {
+  transition: opacity .55s ease, transform .55s cubic-bezier(.2,.8,.2,1), visibility 0s linear 0s !important;
+}
+
+body.lock-active #lockScreen.stage-sleep .lock-passcode,
+body.lock-active #lockScreen.stage-notif .lock-passcode {
+  opacity: 0 !important;
+  visibility: hidden !important;
+  transform: translateY(46px) !important;
+  pointer-events: none !important;
+  transition: opacity .3s ease, transform .3s ease, visibility 0s linear .3s !important;
+}
+
+/* "Tap to wake" */
+body.lock-active #lockScreen .lock-wake-hint {
+  position: absolute !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 9vh !important;
+  margin: 0 !important;
+  text-align: center !important;
+  color: rgba(255,255,255,.9) !important;
+  font-family: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif !important;
+  font-size: 15px !important;
+  font-weight: 500 !important;
+  letter-spacing: .08em !important;
+  text-shadow: 0 2px 10px rgba(0,0,0,.4) !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  transition: opacity .4s ease !important;
+}
+
+body.lock-active #lockScreen.stage-sleep .lock-wake-hint {
+  opacity: 1 !important;
+  animation: wakePulse 2.2s ease-in-out infinite !important;
+}
+
+@keyframes wakePulse {
+  0%, 100% { opacity: .35; }
+  50% { opacity: 1; }
+}
+
+/* WhatsApp notification banner */
+body.lock-active #lockScreen .lock-notif {
+  position: absolute !important;
+  left: 14px !important;
+  right: 14px !important;
+  top: 34vh !important;
+  z-index: 5 !important;
+  cursor: pointer !important;
+  -webkit-tap-highlight-color: transparent !important;
+  filter: drop-shadow(0 12px 22px rgba(0,20,50,.35));
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+  transform: translateY(-40px) scale(.96) !important;
+  transition: opacity .3s ease, transform .3s ease, visibility 0s linear .3s !important;
+}
+
+body.lock-active #lockScreen.stage-notif .lock-notif {
+  opacity: 1 !important;
+  visibility: visible !important;
+  pointer-events: auto !important;
+  transform: translateY(0) scale(1) !important;
+  transition: opacity .35s ease .2s, transform .6s cubic-bezier(.2,1.25,.3,1) .2s, visibility 0s linear .2s !important;
+}
+
+body.lock-active #lockScreen.stage-pass .lock-notif {
+  transform: translateY(-46px) scale(.97) !important;
+}
+
+body.lock-active #lockScreen .lock-notif-bg {
+  display: block !important;
+  width: 100% !important;
+  height: auto !important;
+  user-select: none !important;
+  -webkit-user-drag: none !important;
+}
+
+body.lock-active #lockScreen .lock-notif-text {
+  position: absolute !important;
+  left: 21.5% !important;
+  right: 4.5% !important;
+  top: 13% !important;
+  bottom: 9% !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: flex-start !important;
+  gap: 2px !important;
+  text-align: left !important;
+  font-family: -apple-system, BlinkMacSystemFont, 'Outfit', sans-serif !important;
+}
+
+body.lock-active #lockScreen .lock-notif-title {
+  padding-right: 16% !important;
+  color: #0b0b0d !important;
+  font-size: clamp(13px, 3.9vw, 16px) !important;
+  font-weight: 600 !important;
+  line-height: 1.2 !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+body.lock-active #lockScreen .lock-notif-msg {
+  color: #2a2a2e !important;
+  font-size: clamp(11.5px, 3.4vw, 14px) !important;
+  font-weight: 400 !important;
+  line-height: 1.25 !important;
+  display: -webkit-box !important;
+  -webkit-line-clamp: 2 !important;
+  -webkit-box-orient: vertical !important;
+  overflow: hidden !important;
+}
+
+body.lock-active #lockScreen .lock-notif-hint {
+  position: absolute !important;
+  left: 0 !important;
+  right: 0 !important;
+  top: calc(100% + 14px) !important;
+  text-align: center !important;
+  color: rgba(255,255,255,.92) !important;
+  font-family: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif !important;
+  font-size: 13px !important;
+  letter-spacing: .06em !important;
+  text-shadow: 0 2px 8px rgba(0,0,0,.4) !important;
+  animation: wakePulse 2s ease-in-out infinite !important;
+}
+
+@media (max-height: 650px) {
+  body.lock-active #lockScreen .lock-notif {
+    top: 30vh !important;
+  }
+}
+
+/* ---- Countdown page background: same video wallpaper as the lock screen ----
+   The shared site video is already playing behind everything, so we just
+   reveal it (softly blurred) instead of using a separate flat gradient. */
+#siteBackgroundVideo.site-background-video {
+  transition: filter .7s ease, transform .7s ease !important;
+}
+
+body.lock-active.timer-active > #siteBackgroundVideo {
+  visibility: visible !important;
+  background: #3f6fa8 !important;
+  filter: blur(4px) brightness(.92) saturate(1.05) !important;
+  transform: scale(1.05) !important;
+}
+
+body.lock-active #timerScreen {
+  background: transparent !important;
+}
+
+body.lock-active #timerScreen::before {
+  display: none !important;
+}
+
+body.lock-active #timerScreen::after {
+  background: radial-gradient(circle at center, rgba(255,255,255,.08) 0%, rgba(20,50,100,.16) 60%, rgba(6,18,40,.50) 100%) !important;
+}
+
+body.lock-active #timerScreen .timer-card {
+  background: rgba(240,248,255,.84) !important;
+  border: 1px solid rgba(255,255,255,.65) !important;
+  backdrop-filter: blur(14px) saturate(1.1) !important;
+  -webkit-backdrop-filter: blur(14px) saturate(1.1) !important;
+}
+
+/* Once unlocked the lock screen must be fully gone, otherwise it shows
+   through the (now see-through) countdown page. */
+body.lock-active #lockScreen.is-unlocked {
+  display: none !important;
+}
+
+/* FINAL FLOW FIX:
+   Correct PIN -> original birthday hero page.
+   The countdown is still preserved in the HTML/JS for the rest of the site,
+   but it is not forced open by the password screen. */
+body.lock-active #timerScreen {
+  pointer-events: auto !important;
+}
+body.lock-active #timerScreen .timer-card,
+body.lock-active #timerScreen .timer-continue,
+body.lock-active #timerScreen button {
+  pointer-events: auto !important;
+}
+#lockScreen.is-unlocked {
+  display: none !important;
+}
+
+
+/* ==========================================================
+   SHARED VIDEO BACKGROUND — clean integration
+   Do NOT change the original birthday elements' positioning.
+   ========================================================== */
+
+#siteBackgroundVideo.site-background-video {
+  position: fixed !important;
+  inset: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  min-width: 100% !important;
+  min-height: 100% !important;
+  object-fit: cover !important;
+  object-position: center center !important;
+  display: block !important;
+  z-index: 0 !important;
+  pointer-events: none !important;
+  background: #efb0bf !important;
+}
+
+/* Old static background image is disabled, but all its other page elements remain. */
+body > .background-image {
+  display: none !important;
+}
+
+/* Lock's own video is not a second full-screen layer. The global video continues behind it. */
+body.lock-active > #siteBackgroundVideo {
+  visibility: hidden !important;
+}
+
+/* Restore original birthday UI after unlock. */
+body:not(.lock-active) > #siteBackgroundVideo {
+  visibility: visible !important;
+}
+
+/* Preserve all original positions and only ensure the main hero is above the video. */
+body:not(.lock-active) > .headline {
+  z-index: 20 !important;
+}
+body:not(.lock-active) > .boxgift,
+body:not(.lock-active) > .corner-image,
+body:not(.lock-active) > .corner-image-right,
+body:not(.lock-active) > .bottom-left-right,
+body:not(.lock-active) > .heart1,
+body:not(.lock-active) > .heart2,
+body:not(.lock-active) > #celebrationSky {
+  z-index: 5 !important;
+}
+
+body:not(.lock-active) > #letterScene,
+body:not(.lock-active) > #birthdayJourneyContainer {
+  z-index: 50 !important;
+}
+
+/* Subtle overlay for readability; never covers the interaction because z-index stays below hero content. */
+body:not(.lock-active)::after {
+  content: "" !important;
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: 2 !important;
+  pointer-events: none !important;
+  background: linear-gradient(
+    180deg,
+    rgba(255,185,204,.03),
+    rgba(45,18,35,.08)
+  ) !important;
+}
+
+/* Keep interactive hero elements above the veil. */
+body:not(.lock-active) > .headline,
+body:not(.lock-active) > .boxgift,
+body:not(.lock-active) > .corner-image,
+body:not(.lock-active) > .corner-image-right,
+body:not(.lock-active) > .bottom-left-right,
+body:not(.lock-active) > .heart1,
+body:not(.lock-active) > .heart2,
+body:not(.lock-active) > #celebrationSky {
+  position: absolute !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #siteBackgroundVideo {
+    animation: none !important;
+  }
+}
+
+/* ---------- PIN digits are visible ---------- */
+#lockPinDots span {
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  font-family:'Outfit',sans-serif !important;
+  font-size:15px !important;
+  font-weight:700 !important;
+  color:#fff !important;
+  line-height:1 !important;
+}
+
+#lockPinDots span.filled {
+  color:#fff !important;
+}
+
+/* ---------- Timer comes after the password lock ---------- */
+#timerScreen.is-visible {
+  z-index: 1000000 !important;
+}
+#timerScreen.is-visible .timer-card {
+  position: relative;
+  z-index: 1000001;
+}
+
+/* Final safety: countdown controls remain clickable while the lock gate
+   is waiting for "See the Surprise". */
+#timerScreen.is-visible {
+  pointer-events: auto !important;
+}
+#timerScreen.is-visible *,
+#timerScreen.is-visible button {
+  pointer-events: auto !important;
+}
